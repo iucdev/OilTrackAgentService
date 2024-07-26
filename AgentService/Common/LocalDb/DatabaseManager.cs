@@ -35,7 +35,7 @@ namespace Service.LocalDb {
                     }
 
                     string createQueueTaskRecordTableQuery = @"
-                    CREATE TABLE IF NOT EXISTS QueueTaskRecord (
+                    CREATE TABLE IF NOT EXISTS QueueTaskRecords (
                         Id INTEGER PRIMARY KEY, 
                         CreateDate TEXT, 
                         UpdateDate TEXT, 
