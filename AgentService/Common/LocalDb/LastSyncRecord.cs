@@ -71,13 +71,14 @@ namespace Service.LocalDb {
         public void AddToDbIfNotExists() {
             var count = 0;
             using (var connection = new SQLiteConnection(DatabaseManager.ConnectionString)) {
+                connection.Open();
                 string countQuery = $@"
                     SELECT COUNT(*) FROM {nameof(LastSyncRecord)}
                     WHERE {nameof(InternalTankId)} = @{nameof(InternalTankId)}";
 
                 using (var command = new SQLiteCommand(countQuery, connection)) {
                     command.Parameters.AddWithValue("@InternalTankId", InternalTankId);
-                    count = (int)command.ExecuteScalar();
+                    count = Convert.ToInt32(command.ExecuteScalar());
                 }
             }
 

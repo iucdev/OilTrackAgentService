@@ -60,20 +60,21 @@ namespace Service.LocalDb {
                     using (var command = new SQLiteCommand(createLastSyncRecordTableQuery, connection)) {
                         command.ExecuteNonQuery();
                     }
-
-                    var objectSettings = ObjectSettingsSingleton.Instance.ObjectSettings;
-                    var initLastSyncDate = objectSettings.StartFrom.HasValue ? objectSettings.StartFrom.Value : DateTime.Now.AddYears(-1);
-                    foreach (var @object in objectSettings.Objects) {
-                        @object.ObjectSources.ForEach(e => new LastSyncRecord {
-                            InternalTankId = e.InternalId,
-                            ExternalTankId = e.ExternalId.Value,
-                            LastMeasurementsSyncDate = initLastSyncDate,
-                            LastTransfersSyncDate = initLastSyncDate
-                        }.AddToDbIfNotExists());
-                    }
                 }
             } catch (Exception ex) {
                 throw ex;
+            }
+
+            var objectSettings = ObjectSettingsSingleton.Instance.ObjectSettings;
+            var initLastSyncDate = objectSettings.StartFrom.HasValue ? objectSettings.StartFrom.Value : DateTime.Now.AddYears(-1);
+            foreach (var @object in objectSettings.Objects) {
+                @object.ObjectSources.ForEach(e => new LastSyncRecord
+                {
+                    InternalTankId = e.InternalId,
+                    ExternalTankId = e.ExternalId.Value,
+                    LastMeasurementsSyncDate = initLastSyncDate,
+                    LastTransfersSyncDate = initLastSyncDate
+                }.AddToDbIfNotExists());
             }
         }
     }
