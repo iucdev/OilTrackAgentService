@@ -1,0 +1,63 @@
+{
+  "apiUrl": "https://demo-sunp-api.qoldau.kz", // string
+  "apiToken": "", // string
+  "connectionType": "Из справочинка ConnectionType", // enum
+  "ipConnectionConfig": {
+    "IpAddress": "", // string
+    "Port": null, // int
+    "RSMDBConnectionString": "", // string
+    "DComUid": "", // string
+    "DComPwd": "" // string
+  },
+  "comConnectionConfig": {
+    "PortName": "", // string
+    "BaudRate": null, // int
+    "DataBits": null, // int
+    "Parity": "Из enum Parity", // enum
+    "StopBits": "Из enum StopBits", // enum
+    "ReadTimeout": null, // int
+    "WriteTimeout": null // int
+  },
+  "databaseConnectionConfig": {
+    "ConnectionString": "", // string
+    "DboType": "Из enum DboType" // enum
+  },
+  "clientType": "Из enum ClientType", // enum
+  "objects": [
+    {
+      "objectId": null, // long ИД объекта в системе OilTrack
+      "objectType": "Из enum ObjectsType", // enum
+      "objectSources": [
+        {
+          "internalId": "", // string ИД/наименование резервуара в локали
+          "externalId": null, // long ИД резервуара в системе OilTrack
+          "oilProductType": "Из enum OilProductType", // enum
+          "volumeUnitType": "Из enum VolumeUnitType", // enum
+          "massUnitType": "Из enum MassUnitType", // enum
+          "levelUnitType": "Из enum LevelUnitType", // enum
+          "tankMeasurementParams": {
+            "temperature": "Barrel_3.Temper", // тег Температуры
+            "density": "Barrel_3.Density", // тег Плотности
+            "volume": "Barrel_3.Volume", // тег Объема
+            "mass": "Barrel_3.Massa", // тег Массы
+            "level": "Barrel_3.Level", // тег Уровня
+            "dateTimeStamp": "Barrel_3.DateTimeStamp" // тег Временная метка данных
+          },
+          "tankTransferParams": {
+            "startTime": "Barrel_3.TimeBegOper", // тег Начало операции
+            "endTime": "Barrel_3.TimeFinOper", // тег Конец операции
+            "massStart": "Barrel_3.Massa_Beg_Oper", // тег Масса на начало операции
+            "massFinish": "Barrel_3.Massa_Fin_Oper", // тег Масса на конец операции
+            "levelStart": "Barrel_3.Level_Beg_Oper", // тег Уровень на начало операции
+            "levelFinish": "Barrel_3.Level_Fin_Oper", // тег Уровень на конец операции
+            "volumeStart": "Barrel_3.Volume_Beg_Oper", // тег Объем на начало операции
+            "volumeFinish": "Barrel_3.Volume_Fin_Oper" // тег Объем на конец операции
+          },
+          "table": "", // string
+          "condition": "", // string
+          "join": "" // string
+        }
+      ]
+    }
+  ]
+}
