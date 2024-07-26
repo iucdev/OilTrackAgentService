@@ -28,6 +28,15 @@ namespace Service.LocalDb {
                     }
                     break;
                 case QueueTaskType.SendTankTransfer:
+                    var tanksTransfers = JsonConvert.DeserializeObject<TankTransfers[]>(task.Items);
+                    foreach (var tankTransfers in tanksTransfers) {
+                        var row = new LastSyncRecord
+                        {
+                            ExternalTankId = tankTransfers.TankId,
+                            LastMeasurementsSyncDate = DateTime.Now
+                        };
+                        row.UpdateInDb();
+                    }
                     break;
             }
         }
