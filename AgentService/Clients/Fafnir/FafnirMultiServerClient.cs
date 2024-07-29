@@ -265,23 +265,22 @@ namespace Service.Clients.Fafnir {
                     pos += 9;
 
                     for (var i = 0; i < n; i++) {
-                        float si;
+                        decimal si;
                         try {
-                            si = Tofloat(pos);
+                            si = ToDecimal(pos);
                         } catch (Exception e) {
                             Logger.Error(e);
                             return tankMeasurements;
                         }
 
                         pos += 8;
-                        var result = decimal.Parse(si.ToString("F4").Replace(',', '.'), CultureInfo.InvariantCulture);
 
                         switch (i) {
-                            case 0: sourceValue.Volume = result; break;
-                            case 3: sourceValue.Level = result; break;
-                            case 5: sourceValue.Temperature = result; break;
-                            case 10: sourceValue.Mass = result; break;
-                            case 11: sourceValue.Density = result; break;
+                            case 0: sourceValue.Volume = si; break;
+                            case 3: sourceValue.Level = si; break;
+                            case 5: sourceValue.Temperature = si; break;
+                            case 10: sourceValue.Mass = si; break;
+                            case 11: sourceValue.Density = si; break;
                         }
                     }
 
@@ -315,23 +314,22 @@ namespace Service.Clients.Fafnir {
                     pos += 9;
 
                     for (var i = 0; i < n; i++) {
-                        float si;
+                        decimal si;
                         try {
-                            si = Tofloat(pos);
+                            si = ToDecimal(pos);
                         } catch (Exception e) {
                             Logger.Error(e);
                             return measurementData;
                         }
 
                         pos += 8;
-                        var result = decimal.Parse(si.ToString("F4").Replace(',', '.'));
 
                         switch (i) {
-                            case 0: measurement.Volume = result; break;
-                            case 1: measurement.Mass = result; break;
-                            case 2: measurement.Density = result; break;
-                            case 3: measurement.Level = result; break;
-                            case 5: measurement.Temperature = result; break;
+                            case 0: measurement.Volume = si; break;
+                            case 1: measurement.Mass = si; break;
+                            case 2: measurement.Density = si; break;
+                            case 3: measurement.Level = si; break;
+                            case 5: measurement.Temperature = si; break;
                         }
                     }
                     measurementData.Add(measurement);
@@ -345,12 +343,6 @@ namespace Service.Clients.Fafnir {
 
         private List<TankTransferData> Fill215()
         {
-            var label = new[]
-            {
-                "SVol", "SMass", "SDens", "SWat", "STemp", "EVol", "EMass", "EDens", "EWat", "ETemp", "SHeight", "EHeight", "STcDens",
-                "ETcDens", "STcVol", "ETcVol", "STcOffs", "ETcOff"
-            };
-
             var tankTransfers = new List<TankTransferData>();
 
             try {
@@ -378,52 +370,51 @@ namespace Service.Clients.Fafnir {
                         var dt2 = fillDTVR(pos);
                         pos += 10;
 
-                        transfer.StartDate = dt1 != null ? dt1.Value : DateTime.MinValue;
-                        transfer.EndDate = dt2 != null ? dt2.Value : DateTime.MinValue;
+                        if (!dt1.HasValue || !dt2.HasValue) {
+                            return tankTransfers;
+                        }
 
-                        var line = string.Format("{0,-11}| {1,-10}", transfer.StartDate, transfer.EndDate);
+                        transfer.StartDate = dt1.Value;
+                        transfer.EndDate = dt2.Value;
 
-                        float sVol = 0, eVol = 0, sMass = 0, eMass = 0, sLevel = 0, eLevel = 0;
+                        decimal sVol = 0, eVol = 0, sMass = 0, eMass = 0, sLevel = 0, eLevel = 0;
 
                         var nn = GetValue(pos, 2);
                         nn = int.Parse(nn.ToString(CultureInfo.InvariantCulture), NumberStyles.HexNumber);
                         pos += 2;
 
                         for (var j = 0; j < nn; j++) {
-                            float si;
+                            decimal si;
                             try {
-                                si = Tofloat(pos);
+                                si = ToDecimal(pos);
                             } catch (Exception e) {
                                 Logger.Error(e);
                                 return tankTransfers;
                             }
                             pos += 8;
-                            line += string.Format("| {0,-10}", si);
 
                             switch (j) {
                                 case 0: sVol = si; break;
                                 case 1: sMass = si; break;
                                 case 5: eVol = si; break;
                                 case 6: eMass = si; break;
-                                case 11: sLevel = si; break;
-                                case 12: eLevel = si; break;
+                                case 10: sLevel = si; break;
+                                case 11: eLevel = si; break;
                             }
                         }
 
-                        transfer.VolumeStart = (decimal)sVol;
-                        transfer.VolumeEnd = (decimal)eVol;
-                        transfer.MassStart = (decimal)(sMass);
-                        transfer.MassEnd = (decimal)(eMass);
-                        transfer.LevelStart = (decimal)(sLevel);
-                        transfer.LevelEnd = (decimal)(eLevel);
-
-                        line += string.Format("| {0,5}", buf[pos]);
+                        transfer.VolumeStart = sVol;
+                        transfer.VolumeEnd = eVol;
+                        transfer.MassStart = sMass;
+                        transfer.MassEnd = eMass;
+                        transfer.LevelStart = sLevel;
+                        transfer.LevelEnd = eLevel;
 
                         pos++;
 
                         tankTransfers.Add(transfer);
                     }
-                    pos++; //f
+                    pos++; 
                 }
             } catch (Exception e) {
                 Logger.Error(e);
@@ -453,15 +444,15 @@ namespace Service.Clients.Fafnir {
             return result;
         }
 
-        float Tofloat(int pos)
+        decimal ToDecimal(int pos)
         {
             var raw = new byte[4];
             raw[3] = Convert.ToByte(((char)buf[pos]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 1]).ToString(CultureInfo.InvariantCulture), 16);
             raw[2] = Convert.ToByte(((char)buf[pos + 2]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 3]).ToString(CultureInfo.InvariantCulture), 16);
             raw[1] = Convert.ToByte(((char)buf[pos + 4]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 5]).ToString(CultureInfo.InvariantCulture), 16);
             raw[0] = Convert.ToByte(((char)buf[pos + 6]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 7]).ToString(CultureInfo.InvariantCulture), 16);
-
-            return BitConverter.ToSingle(raw, 0);
+            var floatValue = BitConverter.ToSingle(raw, 0);
+            return (decimal) floatValue;
         }
 
         #endregion
