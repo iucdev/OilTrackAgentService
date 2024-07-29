@@ -1,6 +1,7 @@
 ﻿using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
+using Service.Common;
 using Service.Enums;
 using Sunp.Api.Client;
 using System;
@@ -36,9 +37,6 @@ namespace Service.Clients.ModBus {
                     Logger.Info("Try connect to server {0}", counter);
                     Thread.Sleep(60000);
                 }
-
-                if (ObjectSettings.Objects == null || !ObjectSettings.Objects.Any())
-                    throw new Exception("No any sources in task! Exit");
             }
             catch (Exception e)
             {
@@ -60,7 +58,7 @@ namespace Service.Clients.ModBus {
             var tanksMeasurements = new List<TankMeasurements>();
             foreach(var objectItem in ObjectSettings.Objects) {
                 foreach(var source in objectItem.ObjectSources.Where(t => t.TankMeasurementParams != null)) {
-                    var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value, Measurements = new List<TankMeasurementData>() };
+                    var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value };
                     var measurement = new TankMeasurementData();
                     try {
                         SetChannel(int.Parse(source.InternalId) - 1);
@@ -81,7 +79,7 @@ namespace Service.Clients.ModBus {
 
                         measurement.MeasurementDate = DateTime.Now; //Т.к. протоколом не предусмотрены метки и ЦБУ отвечает практически моментально то дату можем ставить сами.
 
-                        tankMeasurements.Measurements.Add(measurement);
+                        tankMeasurements.Measurements = new[] { measurement }.SetEnums(source);
                         tanksMeasurements.Add(tankMeasurements);
                     } catch (Exception e) {
                         Logger.Error($"Error on FullInfoCMD Message-{e.Message + e.StackTrace}");

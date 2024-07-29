@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Service.Common;
 
 namespace Service.Clients.PI {
     public class PiMultiServerClient : AMultiServerClient
@@ -134,7 +135,7 @@ namespace Service.Clients.PI {
         //}
 
         private TankMeasurements GetTankMeasurements(ObjectSource source) {
-            var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value, Measurements = new List<TankMeasurementData>() };
+            var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value };
             var parameter = source.TankMeasurementParams;
             var measurement = new TankMeasurementData() {
                 MeasurementDate = PiMultiServerClientHelpers.GetDateTime(Snapshot(parameter.DateTimeStamp)),
@@ -148,7 +149,7 @@ namespace Service.Clients.PI {
                 VolumeUnitType = source.VolumeUnitType.Value,
                 OilProductType = source.OilProductType.Value
             };
-            tankMeasurements.Measurements.Add(measurement);
+            tankMeasurements.Measurements = new[] { measurement }.SetEnums(source);
             return tankMeasurements;
         }
 

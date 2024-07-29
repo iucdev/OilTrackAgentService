@@ -11,10 +11,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.Clients.DBO {
     public static class DboConnectionHelpers {
@@ -33,6 +29,9 @@ namespace Service.Clients.DBO {
                 OilProductType = objectSource.OilProductType.Value,
                 VolumeUnitType = objectSource.VolumeUnitType.Value
             };
+            data.OperationType = data.VolumeEnd > data.VolumeStart
+                ? TransferOperationType.Income 
+                : TransferOperationType.Outcome;
             return data;
         }
 

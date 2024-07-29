@@ -4,6 +4,7 @@ using Service.Clients.RSMDB;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
 using Service.Clients.VR;
+using Service.Common;
 using Sunp.Api.Client;
 using System;
 using System.Collections.Generic;
@@ -55,46 +56,44 @@ namespace Nitec.DCM.BusinessLogic.Etalon {
 
         protected override void CollectData()
         {
-            Logger.Debug("Collect data");
+            try {
+                Logger.Debug("Collect data");
+                var tanksMeasurements = new List<TankMeasurements>();
+                var tanksTransfers = new List<TankTransfers>();
 
-            foreach (var @object in ObjectSettings.Objects) {
-                try {
-                    var tanksMeasurements = new List<TankMeasurements>();
-                    var tanksTransfers = new List<TankTransfers>();
+                foreach (var source in ObjectSettings.Objects.First().ObjectSources) {
+                    if (int.TryParse(source.InternalId, out int nom))
+                        if (Send231Wrapped(nom, ObjectSettings.Objects.First().ObjectId.ToString(), ObjectSettings.IpConnectionConfig.RSMDBConnectionString, ObjectSettings.IpConnectionConfig.DComPwd) <= 0)
+                            Logger.Debug("F231 return 0");
 
-                    foreach (var source in ObjectSettings.Objects.First().ObjectSources) {
-                        if (int.TryParse(source.InternalId, out int nom))
-                            if (Send231Wrapped(nom, @object.ObjectId.ToString(), ObjectSettings.IpConnectionConfig.RSMDBConnectionString, ObjectSettings.IpConnectionConfig.DComPwd) <= 0)
-                                Logger.Debug("F231 return 0");
-
-                        if (_tankMeasurements.Any()) {
-                            tanksMeasurements.Add(new TankMeasurements() {
-                                TankId = source.ExternalId.Value,
-                                Measurements = _tankMeasurements
-                            });
-                        }
-
-                        Thread.Sleep(500);
-
-                        if (Send215Wrapped(nom, @object.ObjectId.ToString(), ObjectSettings.IpConnectionConfig.RSMDBConnectionString, ObjectSettings.IpConnectionConfig.DComPwd) <= 0)
-                            Logger.Debug("F215 return 0");
-
-
-                        var transfersWithEndDate = _tankTransfers.Where(t => t.EndDate != DateTime.MinValue).ToArray();
-                        if (transfersWithEndDate.Any()) {
-                            tanksTransfers.Add(new TankTransfers
-                            {
-                                TankId = source.ExternalId.Value,
-                                Transfers = transfersWithEndDate
-                            });
-                        }
+                    if (_tankMeasurements.Any()) {
+                        tanksMeasurements.Add(new TankMeasurements()
+                        {
+                            TankId = source.ExternalId.Value,
+                            Measurements = _tankMeasurements.SetEnums(source)
+                        });
                     }
 
-                    QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                    QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
-                } catch (Exception ex) {
-                    Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
+                    Thread.Sleep(500);
+
+                    if (Send215Wrapped(nom, ObjectSettings.Objects.First().ObjectId.ToString(), ObjectSettings.IpConnectionConfig.RSMDBConnectionString, ObjectSettings.IpConnectionConfig.DComPwd) <= 0)
+                        Logger.Debug("F215 return 0");
+
+
+                    var transfersWithEndDate = _tankTransfers.Where(t => t.EndDate != DateTime.MinValue).ToList();
+                    if (transfersWithEndDate.Any()) {
+                        tanksTransfers.Add(new TankTransfers
+                        {
+                            TankId = source.ExternalId.Value,
+                            Transfers = transfersWithEndDate.SetEnums(source)
+                        });
+                    }
                 }
+
+                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+            } catch (Exception ex) {
+                Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
             }
         }
 

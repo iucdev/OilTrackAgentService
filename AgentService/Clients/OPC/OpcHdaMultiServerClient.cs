@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading;
 using System.Text;
 using Service.LocalDb;
+using Service.Common;
 
 namespace Service.Clients.OPC {
     public class OpcHdaMultiServerClient : AMultiServerClient {
@@ -163,6 +164,7 @@ namespace Service.Clients.OPC {
                     };
 
                     tankMeasurements.Measurements.Add(measurement);
+                    tankMeasurements.Measurements = tankMeasurements.Measurements.ToArray().SetEnums(source);
                     tanksMeasurements.Add(tankMeasurements);
                     group = null;
                 }

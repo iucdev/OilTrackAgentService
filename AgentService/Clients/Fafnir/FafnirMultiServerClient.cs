@@ -2,6 +2,7 @@
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
 using Service.Clients.VR;
+using Service.Common;
 using Service.Dtos;
 using Sunp.Api.Client;
 using System;
@@ -67,7 +68,7 @@ namespace Service.Clients.Fafnir {
                     if (_tankMeasurements.Any()) {
                         tanksMeasurements.Add(new TankMeasurements() {
                             TankId = source.ExternalId.Value,
-                            Measurements = _tankMeasurements
+                            Measurements = _tankMeasurements.SetEnums(source)
                         });
                     }
 
@@ -79,7 +80,7 @@ namespace Service.Clients.Fafnir {
                     if (_tankTransfers.Any()) {
                         tanksTransfers.Add(new TankTransfers {
                             TankId = source.ExternalId.Value,
-                            Transfers = _tankTransfers
+                            Transfers = _tankTransfers.SetEnums(source)
                         });
                     }
                 }
@@ -254,10 +255,13 @@ namespace Service.Clients.Fafnir {
                 }
 
                 var dt = fillDTVR(7);
+                if (dt is null) { 
+                    return tankMeasurements;
+                }
                 var pos = 17;
 
                 while (buf[pos] != 0x26) {
-                    var sourceValue = new TankMeasurementData { MeasurementDate = dt.Value };
+                    var measurement = new TankMeasurementData { MeasurementDate = dt.Value };
                     var tanknum = GetValue(pos, 2);
 
                     var n = GetValue(pos + 7, 2);
@@ -275,15 +279,14 @@ namespace Service.Clients.Fafnir {
                         pos += 8;
 
                         switch (i) {
-                            case 0: sourceValue.Volume = si; break;
-                            case 3: sourceValue.Level = si; break;
-                            case 5: sourceValue.Temperature = si; break;
-                            case 10: sourceValue.Mass = si; break;
-                            case 11: sourceValue.Density = si; break;
+                            case 0: measurement.Volume = si; break;
+                            case 3: measurement.Level = si; break;
+                            case 5: measurement.Temperature = si; break;
+                            case 10: measurement.Mass = si; break;
+                            case 11: measurement.Density = si; break;
                         }
                     }
-
-                    tankMeasurements.Add(sourceValue);
+                    tankMeasurements.Add(measurement);
                 }
             } catch (Exception e) {
                 Logger.Error(e);
@@ -294,15 +297,18 @@ namespace Service.Clients.Fafnir {
 
         private List<TankMeasurementData> Fill214()
         {
-            var measurementData = new List<TankMeasurementData>();
+            var tankMeasurements = new List<TankMeasurementData>();
 
             try {
                 if (!((buf[0] == 01) && (buf[1] == 0x69) && (buf[2] == 0x32) && (buf[3] == 0x31) && (buf[4] == 0x34))) {
                     Logger.Error("Error F214");
-                    return measurementData;
+                    return tankMeasurements;
                 }
 
                 var dt = fillDTVR(7);
+                if (!dt.HasValue) {
+                    return tankMeasurements;
+                }
                 var pos = 17;
 
                 while (buf[pos] != 0x26) {
@@ -318,7 +324,7 @@ namespace Service.Clients.Fafnir {
                             si = ToDecimal(pos);
                         } catch (Exception e) {
                             Logger.Error(e);
-                            return measurementData;
+                            return tankMeasurements;
                         }
 
                         pos += 8;
@@ -331,13 +337,13 @@ namespace Service.Clients.Fafnir {
                             case 5: measurement.Temperature = si; break;
                         }
                     }
-                    measurementData.Add(measurement);
+                    tankMeasurements.Add(measurement);
                 }
             } catch (Exception e) {
                 Logger.Error(e);
             }
 
-            return measurementData;
+            return tankMeasurements;
         }
 
         private List<TankTransferData> Fill215()
