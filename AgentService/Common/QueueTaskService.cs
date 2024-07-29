@@ -49,24 +49,44 @@ namespace Service.Clients.Utils {
         }
 
         public void SaveAsTask(TankTransfers[] items) {
+            var toSave = items.Where(t => t.Transfers.Any());
+            toSave = items.Select(item => {
+                var lastSyncDate = LastSyncRecord.GetByExternalId(item.TankId).LastTransfersSyncDate;
+                var transfers = item.Transfers.Where(transfer => transfer.EndDate > lastSyncDate).ToList();
+                item.Transfers = transfers;
+                return item;
+            });
+            if (!toSave.Any()) {
+                return;
+            }
             lock (syncRoot) {
                 var newTask = new QueueTaskRecord {
                     CreateDate = DateTime.Now,
                     Type = QueueTaskType.SendTankTransfer,
                     Status = QueueTaskStatus.InProcess,
-                    Items = JsonConvert.SerializeObject(items),
+                    Items = JsonConvert.SerializeObject(toSave),
                 };
                 newTask.AddToDb();
             }
         }
 
         public void SaveAsTask(TankMeasurements[] items) {
+            var toSave = items.Where(t => t.Measurements.Any());
+            toSave = items.Select(item => {
+                var lastSyncDate = LastSyncRecord.GetByExternalId(item.TankId).LastMeasurementsSyncDate;
+                var measurements = item.Measurements.Where(measurement => measurement.MeasurementDate > lastSyncDate).ToList();
+                item.Measurements = measurements;
+                return item;
+            });
+            if (!toSave.Any()) {
+                return;
+            }
             lock (syncRoot) {
                 var newTask = new QueueTaskRecord {
                     CreateDate = DateTime.Now,
                     Type = QueueTaskType.SendTankMeasurements,
                     Status = QueueTaskStatus.InProcess,
-                    Items = JsonConvert.SerializeObject(items),
+                    Items = JsonConvert.SerializeObject(toSave),
                 };
                 newTask.AddToDb();
             }

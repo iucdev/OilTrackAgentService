@@ -6,6 +6,7 @@ using Service.Enums;
 using Sunp.Api.Client;
 using System;
 using System.Data.SQLite;
+using System.Linq;
 
 namespace Service.LocalDb {
     public class LastSyncRecord {
@@ -25,7 +26,7 @@ namespace Service.LocalDb {
                             var row = new LastSyncRecord
                             {
                                 ExternalTankId = tankMeasurements.TankId,
-                                LastMeasurementsSyncDate = DateTime.Now
+                                LastMeasurementsSyncDate = tankMeasurements.Measurements.Max(t => t.MeasurementDate).DateTime
                             };
                             row.UpdateInDb();
                         }
@@ -36,7 +37,7 @@ namespace Service.LocalDb {
                             var row = new LastSyncRecord
                             {
                                 ExternalTankId = tankTransfers.TankId,
-                                LastMeasurementsSyncDate = DateTime.Now
+                                LastTransfersSyncDate = tankTransfers.Transfers.Max(t => t.EndDate).DateTime
                             };
                             row.UpdateInDb();
                         }
@@ -48,9 +49,37 @@ namespace Service.LocalDb {
             }
         }
 
+        public static LastSyncRecord GetByExternalId(long externalTankId)
+        {
+            using (var connection = new SQLiteConnection(DatabaseManager.ConnectionString)) {
+                connection.Open();
+                var query = $@"
+                    SELECT * FROM {nameof(LastSyncRecord)}
+                    WHERE {nameof(ExternalTankId)} = @{nameof(ExternalTankId)}
+                ";
+                using (var command = new SQLiteCommand(query, connection)) {
+                    command.Parameters.AddWithValue("@ExternalTankId", externalTankId);
+                    using (var reader = command.ExecuteReader()) {
+                        if (reader.Read()) {
+                            return new LastSyncRecord
+                            {
+                                InternalTankId = reader["InternalTankId"].ToString(),
+                                ExternalTankId = externalTankId,
+                                LastMeasurementsSyncDate = DateTime.Parse(reader["LastMeasurementsSyncDate"].ToString()),
+                                LastTransfersSyncDate = DateTime.Parse(reader["LastTransfersSyncDate"].ToString())
+                            };
+                        } else {
+                            throw new Exception();
+                        }
+                    }
+                }
+            }
+        }
+
         public static LastSyncRecord Get(string internalTankId, long externalTankId)
         {
             using (var connection = new SQLiteConnection(DatabaseManager.ConnectionString)) {
+                connection.Open();
                 var query = $@"
                     SELECT * FROM {nameof(LastSyncRecord)}
                     WHERE {nameof(InternalTankId)} = @{nameof(InternalTankId)}
