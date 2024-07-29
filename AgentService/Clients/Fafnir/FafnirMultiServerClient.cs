@@ -76,11 +76,10 @@ namespace Service.Clients.Fafnir {
                     if (Send215(nom) <= 0)
                         Logger.Debug("F215 return 0");
 
-                    var transfersWithEndDate = _tankTransfers.Where(t => t.EndDate != DateTime.MinValue).ToArray();
-                    if (transfersWithEndDate.Any()) {
+                    if (_tankTransfers.Any()) {
                         tanksTransfers.Add(new TankTransfers {
                             TankId = source.ExternalId.Value,
-                            Transfers = transfersWithEndDate
+                            Transfers = _tankTransfers
                         });
                     }
                 }
@@ -430,18 +429,22 @@ namespace Service.Clients.Fafnir {
 
         private DateTime? fillDTVR(int nom)
         {
-            DateTime? result = null;
             try {
                 var yy = GetValue(nom, 2);
                 var mm = GetValue(nom + 2, 2);
                 var dd = GetValue(nom + 4, 2);
                 var hh = GetValue(nom + 6, 2);
                 var mn = GetValue(nom + 8, 2);
-                result = new DateTime(yy + 2000, mm, dd, hh, mn, 0, 0);
+
+                if (yy + 2000 > DateTime.Now.Year || mm > 12 || dd > 31 || hh > 24 || mn > 59) {
+                    return null;
+                }
+
+                return new DateTime(yy + 2000, mm, dd, hh, mn, 0, 0);
             } catch (Exception e) {
                 Logger.Error($"error on fillDTVR {e.Message + e.StackTrace}");
+                return null;
             }
-            return result;
         }
 
         decimal ToDecimal(int pos)

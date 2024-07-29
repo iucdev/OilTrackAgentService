@@ -108,7 +108,7 @@ namespace Service.Clients.Scheduler {
                         QueueTaskService.Instance.AbandonTask(task, response.Error);
                     }
 
-                    LastSyncRecord.Update(task);
+                    LastSyncRecord.Update(task, _logger);
                     _logger.Debug($"Task execution with id: {task.Id} succeeded");
                 } catch (Exception exception) {
                     _logger.Error($"Error occured on task execution with id: {task.Id}. Error: {exception.Message}");

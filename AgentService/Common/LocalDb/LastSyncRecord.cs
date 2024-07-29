@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NLog;
 using Service.Clients.Scheduler;
 using Service.Dtos;
 using Service.Enums;
@@ -13,35 +14,42 @@ namespace Service.LocalDb {
         public DateTime LastMeasurementsSyncDate { get; set; }
         public DateTime LastTransfersSyncDate { get; set; }
 
-        public static void Update(QueueTaskRecord task)
+        public static void Update(QueueTaskRecord task, Logger logger)
         {
-            switch (task.Type) {
-                case QueueTaskType.SendTankMeasurements:
-                    var items = JsonConvert.DeserializeObject<TankMeasurements[]>(task.Items);
-                    foreach (var tankMeasurements in items) {
-                        var row = new LastSyncRecord
-                        {
-                            ExternalTankId = tankMeasurements.TankId,
-                            LastMeasurementsSyncDate = DateTime.Now
-                        };
-                        row.UpdateInDb();
-                    }
-                    break;
-                case QueueTaskType.SendTankTransfer:
-                    var tanksTransfers = JsonConvert.DeserializeObject<TankTransfers[]>(task.Items);
-                    foreach (var tankTransfers in tanksTransfers) {
-                        var row = new LastSyncRecord
-                        {
-                            ExternalTankId = tankTransfers.TankId,
-                            LastMeasurementsSyncDate = DateTime.Now
-                        };
-                        row.UpdateInDb();
-                    }
-                    break;
+            logger.Info($"Update last sync record call");
+            try {
+                switch (task.Type) {
+                    case QueueTaskType.SendTankMeasurements:
+                        var items = JsonConvert.DeserializeObject<TankMeasurements[]>(task.Items);
+                        foreach (var tankMeasurements in items) {
+                            var row = new LastSyncRecord
+                            {
+                                ExternalTankId = tankMeasurements.TankId,
+                                LastMeasurementsSyncDate = DateTime.Now
+                            };
+                            row.UpdateInDb();
+                        }
+                        break;
+                    case QueueTaskType.SendTankTransfer:
+                        var tanksTransfers = JsonConvert.DeserializeObject<TankTransfers[]>(task.Items);
+                        foreach (var tankTransfers in tanksTransfers) {
+                            var row = new LastSyncRecord
+                            {
+                                ExternalTankId = tankTransfers.TankId,
+                                LastMeasurementsSyncDate = DateTime.Now
+                            };
+                            row.UpdateInDb();
+                        }
+                        break;
+                }
+            } catch (Exception ex) {
+                logger.Info($"Error on update last sync record: {ex.Message + ex.StackTrace}");
+                throw ex;
             }
         }
 
-        public static LastSyncRecord Get(string internalTankId, long externalTankId) {
+        public static LastSyncRecord Get(string internalTankId, long externalTankId)
+        {
             using (var connection = new SQLiteConnection(DatabaseManager.ConnectionString)) {
                 var query = $@"
                     SELECT * FROM {nameof(LastSyncRecord)}
@@ -68,7 +76,8 @@ namespace Service.LocalDb {
             }
         }
 
-        public void AddToDbIfNotExists() {
+        public void AddToDbIfNotExists()
+        {
             var count = 0;
             using (var connection = new SQLiteConnection(DatabaseManager.ConnectionString)) {
                 connection.Open();
@@ -112,11 +121,12 @@ namespace Service.LocalDb {
             }
         }
 
-        public void UpdateInDb() {
+        public void UpdateInDb()
+        {
             using (var connection = new SQLiteConnection(DatabaseManager.ConnectionString)) {
                 connection.Open();
                 string updateQuery = $@"
-                UPDATE TankTransferRecord SET 
+                UPDATE LastSyncRecord SET 
                     {nameof(InternalTankId)} = @{nameof(InternalTankId)}, 
                     {nameof(ExternalTankId)} = @{nameof(ExternalTankId)}, 
                     {nameof(LastMeasurementsSyncDate)} = @{nameof(LastMeasurementsSyncDate)},
