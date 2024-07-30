@@ -78,7 +78,7 @@ namespace Service.Clients.IGLA {
                         Logger.Error($"Error on FullInfoCMD Message-{e.Message + e.StackTrace}");
                     }
                 }
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
             } catch (Exception ex) { 
                 Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
             }

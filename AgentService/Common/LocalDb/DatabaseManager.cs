@@ -1,5 +1,5 @@
-﻿using Service.Clients.Utils;
-using Service.Dtos;
+﻿using NLog;
+using Service.Clients.Utils;
 using System;
 using System.Data.SQLite;
 
@@ -7,6 +7,7 @@ namespace Service.LocalDb {
     public class DatabaseManager {
         private static readonly string _currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string ConnectionString = $"Data Source={_currentDirectory}database.db;Version=3;";
+        private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
 
         public static void InitializeDatabase() {
             try {
@@ -74,7 +75,7 @@ namespace Service.LocalDb {
                     ExternalTankId = e.ExternalId.Value,
                     LastMeasurementsSyncDate = initLastSyncDate,
                     LastTransfersSyncDate = initLastSyncDate
-                }.AddToDbIfNotExists());
+                }.AddToDbIfNotExists(_logger));
             }
         }
     }

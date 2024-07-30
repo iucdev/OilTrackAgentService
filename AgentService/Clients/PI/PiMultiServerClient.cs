@@ -164,7 +164,7 @@ namespace Service.Clients.PI {
                     tanksMeasurements.Add(GetTankMeasurements(source));
                 }
 
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
             }
             catch (Exception ex)
             {

@@ -82,8 +82,8 @@ namespace Service.Clients.VR {
                     }
                 }
 
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
             } catch (Exception ex) {
                 Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
             }

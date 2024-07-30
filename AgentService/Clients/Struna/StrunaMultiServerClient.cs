@@ -88,7 +88,7 @@ namespace Service.Clients.ModBus {
             }
             try
             {
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
             }
             catch (Exception ex)
             {

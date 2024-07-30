@@ -1,4 +1,5 @@
-﻿using Service.Clients.Client;
+﻿using Newtonsoft.Json;
+using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
 using Service.Common;
@@ -91,6 +92,7 @@ namespace Service.Clients.PV4 {
                         continue;
                     }
 
+                    value.ExternalId = source.ExternalId.Value;
                     value.ObjectSource = source;
                     value.Data.Mass = pr.Data.Mass;
 
@@ -140,7 +142,7 @@ namespace Service.Clients.PV4 {
                     var tanksMeasurements = new List<TankMeasurements>();
                     var tanksTransfers = new List<TankTransfers>();
 
-                    foreach (var source in @object.ObjectSources.Where(s => s.TankMeasurementParams != null)) {
+                    foreach (var source in @object.ObjectSources) {
                         var measurements = collectMeasurements(source);
                         if (measurements != null) {
                             tanksMeasurements.Add(measurements);
@@ -154,8 +156,8 @@ namespace Service.Clients.PV4 {
                         }
                     }
 
-                    QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                    QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                    QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                    QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
                 }
             } catch (Exception ex) {
                 Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");

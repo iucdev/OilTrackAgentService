@@ -352,8 +352,8 @@ namespace Service.Clients.OPC {
                 var tanksMeasurements = collectTankMeasurements(tankMeasurementResults).ToList();
                 var tanksTransfers = collectTankTransfers(tankTransferResults).ToList();
 
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
             } catch (Exception e) {
                 Logger.Error(e.StackTrace);
             }

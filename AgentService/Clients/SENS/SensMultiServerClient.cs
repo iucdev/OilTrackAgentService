@@ -108,7 +108,7 @@ namespace Service.Clients.SENS {
                 }
 
                 try {
-                    QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                    QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
                 } catch (Exception ex) {
                     Logger.Error($"SendSourceValues error {ex.Message + ex.StackTrace}");
                 }

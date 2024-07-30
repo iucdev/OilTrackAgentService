@@ -28,9 +28,8 @@ namespace AgentService {
                 };
 
             config.AddTarget("logfile", target);
-            var rule = new LoggingRule("*", LogLevel.Debug, target);
 
-            config.LoggingRules.Add(rule);
+            config.AddRule(LogLevel.Info, LogLevel.Fatal, target);
             LogManager.Configuration = config;
 
             DatabaseManager.InitializeDatabase();

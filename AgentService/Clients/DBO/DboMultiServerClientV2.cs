@@ -40,8 +40,8 @@ namespace Service.Clients.DBO {
                     );
                 }
 
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
             } catch (Exception ex) { 
                 Logger.Error($"Collect data error {ex.Message + ex.StackTrace}");
             }
