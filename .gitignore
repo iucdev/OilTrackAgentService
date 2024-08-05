@@ -275,3 +275,6 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+/AgentService/install_instructions/InstallUtil.InstallLog
+/AgentService/install_instructions/uninstall.bat
+/AgentService/install_instructions/install.bat

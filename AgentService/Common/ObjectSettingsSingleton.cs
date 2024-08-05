@@ -28,92 +28,8 @@ namespace Service.Clients.Utils {
                 string json = File.ReadAllText(jsonFilePath);
                 ObjectSettings = JsonConvert.DeserializeObject<ObjectSettings>(json);
 
-                var error = string.Empty;
-
-                if (ObjectSettings is null) { 
-                    error = "ObjectSettings->ObjectSettings cannot be null";
-                    _logger.Error(error);
+                if (!validate(out var error)) { 
                     throw new Exception(error);
-                }
-
-                if (!ObjectSettings.Objects.Any()) {
-                    error = "ObjectSettings->Objects must have items";
-                    _logger.Error(error);
-                    throw new Exception(error);
-                }
-
-                if (string.IsNullOrEmpty(ObjectSettings.ApiUrl) || string.IsNullOrEmpty(ObjectSettings.ApiToken)) {
-                    error = "ObjectSettings->Objects->ApiUrl/ApiToken cannot be null";
-                    _logger.Error(error);
-                    throw new Exception(error);
-                }
-
-                if (ObjectSettings.Objects.Any(o => !o.ObjectSources.Any() || o.ObjectId == null)) {
-                    error = "ObjectSettings->Objects->ObjectId cannot be null and ObjectSources must have items";
-                    _logger.Error(error);
-                    throw new Exception(error);
-                }
-
-                if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => string.IsNullOrEmpty(os.InternalId) || os.ExternalId == null))) {
-                    error = "ObjectSettings->Objects->InternalId/ExternalId cannot be null";
-                    _logger.Error(error);
-                    throw new Exception(error);
-                }
-
-                if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => os.LevelUnitType == null || os.VolumeUnitType == null || os.MassUnitType== null))) {
-                    error = "ObjectSettings->Objects->LevelUnitType/VolumeUnitType/MassUnitType cannot be null";
-                    _logger.Error(error);
-                    throw new Exception(error);
-                }
-
-                if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => os.OilProductType == null))) {
-                    error = "ObjectSettings->Objects->OilProductType cannot be null";
-                    _logger.Error(error);
-                    throw new Exception(error);
-                }
-
-                switch (ObjectSettings.ConnectionType) {
-                    case ConnectionType.Dbo:
-                        if (ObjectSettings.DatabaseConnectionConfig is null) {
-                            error = "ObjectSettings->DatabaseConnectionConfig cannot be null";
-                            _logger.Error(error);
-                            throw new Exception(error);
-                        }
-                        if (ObjectSettings.DatabaseConnectionConfig.DboType == null || string.IsNullOrEmpty(ObjectSettings.DatabaseConnectionConfig.ConnectionString)) {
-                            error = "ObjectSettings->DatabaseConnectionConfig->DboType/ConnectionString cannot be null";
-                            _logger.Error(error);
-                            throw new Exception(error);
-                        }
-                        if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(t => string.IsNullOrEmpty(t.Condition) || string.IsNullOrEmpty(t.Table)))) {
-                            error = "ObjectSettings->Objects->ObjectSources->Condition/Table cannot be null or empty";
-                            _logger.Error(error);
-                            throw new Exception(error);
-                        }
-                        break;
-                    case ConnectionType.Ip:
-                        if (ObjectSettings.IpConnectionConfig is null) {
-                            error = "ObjectSettings->IpConnectionConfig cannot be null";
-                            _logger.Error(error);
-                            throw new Exception(error);
-                        }
-                        if (string.IsNullOrEmpty(ObjectSettings.IpConnectionConfig.IpAddress)) {
-                            error = "ObjectSettings->IpConnectionConfig->IpAddress cannot be null or empty";
-                            _logger.Error(error);
-                            throw new Exception(error);
-                        }
-                        break;
-                    case ConnectionType.Com:
-                        if (ObjectSettings.ComConnectionConfig is null) {
-                            error = "ObjectSettings->ComConnectionConfig cannot be null";
-                            _logger.Error(error);
-                            throw new Exception(error);
-                        }
-                        if (string.IsNullOrEmpty(ObjectSettings.ComConnectionConfig.PortName)) {
-                            error = "ObjectSettings->ComConnectionConfig->PortName cannot be null or empty";
-                            _logger.Error(error);
-                            throw new Exception(error);
-                        }
-                        break;
                 }
             } catch (Exception ex) {
                 _logger.Error($"Try init ObjectSettingsSingleton failed. Error: {ex.Message}");
@@ -121,8 +37,84 @@ namespace Service.Clients.Utils {
             }
         }
 
-        private bool validate() {
-            return false;
+        private bool validate(out string error) {
+            error = string.Empty;
+
+            if (ObjectSettings is null) {
+                error = "ObjectSettings->ObjectSettings cannot be null";
+                _logger.Error(error);
+            }
+
+            if (!ObjectSettings.Objects.Any()) {
+                error = "ObjectSettings->Objects must have items";
+                _logger.Error(error);
+            }
+
+            if (string.IsNullOrEmpty(ObjectSettings.ApiUrl) || string.IsNullOrEmpty(ObjectSettings.ApiToken)) {
+                error = "ObjectSettings->Objects->ApiUrl/ApiToken cannot be null";
+                _logger.Error(error);
+            }
+
+            if (ObjectSettings.Objects.Any(o => !o.ObjectSources.Any() || o.ObjectId == null)) {
+                error = "ObjectSettings->Objects->ObjectId cannot be null and ObjectSources must have items";
+                _logger.Error(error);
+            }
+
+            if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => string.IsNullOrEmpty(os.InternalId) || os.ExternalId == null))) {
+                error = "ObjectSettings->Objects->InternalId/ExternalId cannot be null";
+                _logger.Error(error);
+            }
+
+            if (ObjectSettings.ClientType == ClientType.DboClient && ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => os.LevelUnitType == null || os.VolumeUnitType == null || os.MassUnitType == null))) {
+                error = "ObjectSettings->Objects->LevelUnitType/VolumeUnitType/MassUnitType cannot be null";
+                _logger.Error(error);
+            }
+
+            if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => os.OilProductType == null))) {
+                error = "ObjectSettings->Objects->OilProductType cannot be null";
+                _logger.Error(error);
+            }
+
+            switch (ObjectSettings.ConnectionType) {
+                case ConnectionType.Dbo:
+                    if (ObjectSettings.DatabaseConnectionConfig is null) {
+                        error = "ObjectSettings->DatabaseConnectionConfig cannot be null";
+                        _logger.Error(error);
+                    }
+                    if (ObjectSettings.DatabaseConnectionConfig.DboType == null || string.IsNullOrEmpty(ObjectSettings.DatabaseConnectionConfig.ConnectionString)) {
+                        error = "ObjectSettings->DatabaseConnectionConfig->DboType/ConnectionString cannot be null";
+                        _logger.Error(error);
+                    }
+                    if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(t => string.IsNullOrEmpty(t.Condition) || string.IsNullOrEmpty(t.Table)))) {
+                        error = "ObjectSettings->Objects->ObjectSources->Condition/Table cannot be null or empty";
+                        _logger.Error(error);
+                    }
+                    break;
+                case ConnectionType.Ip:
+                    if (ObjectSettings.IpConnectionConfig is null) {
+                        error = "ObjectSettings->IpConnectionConfig cannot be null";
+                        _logger.Error(error);
+                    }
+                    if (string.IsNullOrEmpty(ObjectSettings.IpConnectionConfig.IpAddress)) {
+                        error = "ObjectSettings->IpConnectionConfig->IpAddress cannot be null or empty";
+                        _logger.Error(error);
+                    }
+                    break;
+                case ConnectionType.Com:
+                    if (ObjectSettings.ComConnectionConfig is null) {
+                        error = "ObjectSettings->ComConnectionConfig cannot be null";
+                        _logger.Error(error);
+                    }
+                    if (string.IsNullOrEmpty(ObjectSettings.ComConnectionConfig.PortName)) {
+                        error = "ObjectSettings->ComConnectionConfig->PortName cannot be null or empty";
+                        _logger.Error(error);
+                    }
+                    break;
+            }
+            if (!string.IsNullOrEmpty(error)) {
+                return false;
+            }
+            return true;
         }
     }
 

@@ -411,7 +411,7 @@ namespace Service.Clients.VR {
                 mn = GetValue(nom + 8, 2);
                 result = new DateTime(yy + 2000, mm, dd, hh, mn, 0, 0);
             } catch (Exception e) {
-                Logger.Error("error on fillDTVR {0}", e);
+                Logger.Error($"Error on fillDTVR {e.Message + e.StackTrace}");
             }
             return result;
         }

@@ -41,7 +41,7 @@ namespace Service.LocalDb {
                         UpdateDate TEXT, 
                         Type TEXT, 
                         Status TEXT, 
-                        RequestBodyJson TEXT, 
+                        Items TEXT, 
                         Error TEXT
                     )";
 

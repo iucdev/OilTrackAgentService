@@ -8,12 +8,14 @@ using Service.Common;
 
 namespace AgentService {
     static class Program {
-        static void Main(string[] args) {
+        static void Main(string[] args)
+        {
             ConfigurationItemFactory.Default.LayoutRenderers.RegisterDefinition("CustomAppender", typeof(CustomAppender));
             var config = new LoggingConfiguration();
 
             var target =
-                new FileTarget {
+                new FileTarget
+                {
                     Layout = "${CustomAppender}",
                     FileName = "${basedir}/logs/${shortdate}.log",
                     ArchiveFileName = "${basedir}/logs/Archive/Trace_{#}.zip",
@@ -38,7 +40,8 @@ namespace AgentService {
             RunService();
         }
 
-        private static void RunService() {
+        private static void RunService()
+        {
             var servicesToRun = new ServiceBase[] {
                 new Service()
             };

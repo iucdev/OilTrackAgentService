@@ -11,7 +11,6 @@ namespace AgentService {
     public partial class Service : ServiceBase
     {
         private static readonly Logger Logger = LogManager.GetLogger(typeof(Service).Name);
-        private static long? objectId = null;
         private static bool isPowerEvent = true;
 
         public Service()
@@ -55,7 +54,7 @@ namespace AgentService {
 
         protected override void OnStart(string[] args)
         {
-            //System.Diagnostics.Debugger.Launch(); If you want to run it in debug, please, uncomment
+            // System.Diagnostics.Debugger.Launch(); //If you want to run it in debug, please, uncomment
             Logger.Debug(Environment.NewLine + "*****************************************************************************************   OnStart   *************************************************************************************************");
 
             try {
