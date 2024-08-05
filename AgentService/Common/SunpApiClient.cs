@@ -420,100 +420,26 @@ namespace Sunp.Api.Client {
         }
 
         /// <summary>
-        /// Отправка замеров с массовых расходомеров на приеме (слив)
+        /// Отправка замеров с массовых расходомеров на приеме
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ResponseBodyBase> DeviceSendFlowmeterInputIndicatorsAsync(SendFlowmeterInputIndicatorsRequestBody requestBody)
+        public virtual System.Threading.Tasks.Task<ResponseBodyBase> DeviceSendFlowmeterIndicatorsAsync(SendFlowmeterIndicatorsRequestBody requestBody)
         {
-            return DeviceSendFlowmeterInputIndicatorsAsync(requestBody, System.Threading.CancellationToken.None);
+            return DeviceSendFlowmeterIndicatorsAsync(requestBody, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <summary>
-        /// Отправка замеров с массовых расходомеров на приеме (слив)
+        /// Отправка замеров с массовых расходомеров на приеме
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ResponseBodyBase> DeviceSendFlowmeterInputIndicatorsAsync(SendFlowmeterInputIndicatorsRequestBody requestBody, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ResponseBodyBase> DeviceSendFlowmeterIndicatorsAsync(SendFlowmeterIndicatorsRequestBody requestBody, System.Threading.CancellationToken cancellationToken)
         {
             if (requestBody == null)
                 throw new System.ArgumentNullException("requestBody");
 
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Device/SendFlowmeterInputIndicators");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try {
-                using (var request_ = new System.Net.Http.HttpRequestMessage()) {
-                    var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(requestBody, _settings.Value));
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try {
-                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                        if (response_.Content != null && response_.Content.Headers != null) {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200) {
-                            var objectResponse_ = await ReadObjectResponseAsync<ResponseBodyBase>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null) {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        } else {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <summary>
-        /// Отправка замеров с массовых расходомеров на отгрузке (налив)
-        /// </summary>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ResponseBodyBase> DeviceSendFlowmeterOutputIndicatorsAsync(SendFlowmeterOutputIndicatorsRequestBody requestBody)
-        {
-            return DeviceSendFlowmeterOutputIndicatorsAsync(requestBody, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Отправка замеров с массовых расходомеров на отгрузке (налив)
-        /// </summary>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ResponseBodyBase> DeviceSendFlowmeterOutputIndicatorsAsync(SendFlowmeterOutputIndicatorsRequestBody requestBody, System.Threading.CancellationToken cancellationToken)
-        {
-            if (requestBody == null)
-                throw new System.ArgumentNullException("requestBody");
-
-            var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Device/SendFlowmeterOutputIndicators");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Device/SendFlowmeterIndicators");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -1107,137 +1033,137 @@ namespace Sunp.Api.Client {
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
     public enum OilProductType {
 
+        [System.Runtime.Serialization.EnumMember(Value = @"AI76")]
+        AI76 = 0,
+
         [System.Runtime.Serialization.EnumMember(Value = @"AI80")]
-        AI80 = 0,
+        AI80 = 1,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI_92")]
-        AI_92 = 1,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI91")]
+        AI91 = 2,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI96")]
-        AI96 = 2,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI93")]
+        AI93 = 3,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"DTZ")]
-        DTZ = 3,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI92")]
+        AI92 = 4,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"DTL")]
-        DTL = 4,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI92K4")]
+        AI92K4 = 5,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"M100")]
-        M100 = 5,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI92K5")]
+        AI92K5 = 6,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"TS1")]
-        TS1 = 6,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DTZK4")]
-        DTZK4 = 7,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"FR60205")]
-        FR60205 = 8,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"VG")]
-        VG = 9,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"VKAI96")]
-        VKAI96 = 10,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"BT")]
-        BT = 11,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"GC")]
-        GC = 12,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Gn")]
-        Gn = 13,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"KB")]
-        KB = 14,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"KD")]
-        KD = 15,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"KK")]
-        KK = 16,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"CL")]
-        CL = 17,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"CLG")]
-        CLG = 18,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"CLR")]
-        CLR = 19,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"CLB")]
-        CLB = 20,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"MTBE")]
-        MTBE = 21,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"SPBT")]
-        SPBT = 22,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"SUG")]
-        SUG = 23,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"HOP")]
-        HOP = 24,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"FRC5")]
-        FRC5 = 25,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"HT")]
-        HT = 26,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DTM")]
-        DTM = 27,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI92PRIME")]
+        AI92PRIME = 7,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI95")]
-        AI95 = 28,
+        AI95 = 8,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI_95_K4")]
-        AI_95_K4 = 29,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI95K4")]
+        AI95K4 = 9,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI_95_K5")]
-        AI_95_K5 = 30,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI95K5")]
+        AI95K5 = 10,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI95PREMIUM")]
+        AI95PREMIUM = 11,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI95PRIME")]
+        AI95PRIME = 12,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"G95")]
+        G95 = 13,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI96")]
+        AI96 = 14,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI96K4")]
+        AI96K4 = 15,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI98")]
-        AI98 = 31,
+        AI98 = 16,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"FRAC")]
-        FRAC = 32,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI98K4")]
+        AI98K4 = 17,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"Fuel")]
-        Fuel = 33,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI98K5")]
+        AI98K5 = 18,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"PT")]
-        PT = 34,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI98SUPER")]
+        AI98SUPER = 19,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"Oil")]
-        Oil = 35,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI98PRIME")]
+        AI98PRIME = 20,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI_92_K4")]
-        AI_92_K4 = 36,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI100")]
+        AI100 = 21,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI_92_K5")]
-        AI_92_K5 = 37,
+        [System.Runtime.Serialization.EnumMember(Value = @"G100")]
+        G100 = 22,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI98_K4")]
-        AI98_K4 = 38,
+        [System.Runtime.Serialization.EnumMember(Value = @"DT")]
+        DT = 23,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"DTE_K5")]
-        DTE_K5 = 39,
+        [System.Runtime.Serialization.EnumMember(Value = @"DTZ")]
+        DTZ = 24,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI_93")]
-        AI_93 = 40,
+        [System.Runtime.Serialization.EnumMember(Value = @"DTZK2")]
+        DTZK2 = 25,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI95_K5")]
-        AI95_K5 = 41,
+        [System.Runtime.Serialization.EnumMember(Value = @"DTZK4")]
+        DTZK4 = 26,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI98_K5")]
-        AI98_K5 = 42,
+        [System.Runtime.Serialization.EnumMember(Value = @"DTZK5")]
+        DTZK5 = 27,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"DTE_K2")]
-        DTE_K2 = 43,
+        [System.Runtime.Serialization.EnumMember(Value = @"DTZPRIME")]
+        DTZPRIME = 28,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTL")]
+        DTL = 29,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTLK4")]
+        DTLK4 = 30,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTLK5")]
+        DTLK5 = 31,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTLPRIME")]
+        DTLPRIME = 32,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTA")]
+        DTA = 33,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTAK2")]
+        DTAK2 = 34,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTAK4")]
+        DTAK4 = 35,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTAK5")]
+        DTAK5 = 36,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTE")]
+        DTE = 37,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTEK2")]
+        DTEK2 = 38,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTEK4")]
+        DTEK4 = 39,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTEK5")]
+        DTEK5 = 40,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTXP")]
+        DTXP = 41,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTM")]
+        DTM = 42,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"M100")]
+        M100 = 43,
 
         [System.Runtime.Serialization.EnumMember(Value = @"ZM40")]
         ZM40 = 44,
@@ -1245,113 +1171,29 @@ namespace Sunp.Api.Client {
         [System.Runtime.Serialization.EnumMember(Value = @"ZМ100")]
         ZМ100 = 45,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI92_K4")]
-        AI92_K4 = 46,
+        [System.Runtime.Serialization.EnumMember(Value = @"TS1")]
+        TS1 = 46,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI96_K4")]
-        AI96_K4 = 47,
+        [System.Runtime.Serialization.EnumMember(Value = @"JETFUEL")]
+        JETFUEL = 47,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI95_K4")]
-        AI95_K4 = 48,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DTE")]
-        DTE = 49,
+        [System.Runtime.Serialization.EnumMember(Value = @"PTB")]
+        PTB = 48,
 
         [System.Runtime.Serialization.EnumMember(Value = @"HYDRAZINE")]
-        HYDRAZINE = 50,
+        HYDRAZINE = 49,
 
         [System.Runtime.Serialization.EnumMember(Value = @"NPD")]
-        NPD = 51,
+        NPD = 50,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI76")]
-        AI76 = 52,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DTA")]
-        DTA = 53,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DTZ_K5")]
-        DTZ_K5 = 54,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DTL_K4")]
-        DTL_K4 = 55,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT_L_K5")]
-        DT_L_K5 = 56,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"NULL")]
-        NULL = 57,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"G_100")]
-        G_100 = 58,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"G_95")]
-        G_95 = 59,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT_Z_K2")]
-        DT_Z_K2 = 60,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT_E_K4")]
-        DT_E_K4 = 61,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT_A_K4")]
-        DT_A_K4 = 62,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT_XR")]
-        DT_XR = 63,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT")]
-        DT = 64,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT_A_K2")]
-        DT_A_K2 = 65,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"AI91")]
-        AI91 = 66,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"REAKTIVNOE_TOPLIVO")]
-        REAKTIVNOE_TOPLIVO = 67,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"EMPTY")]
-        EMPTY = 68,
+        [System.Runtime.Serialization.EnumMember(Value = @"DISTILLYAT")]
+        DISTILLYAT = 51,
 
         [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN")]
-        UNKNOWN = 69,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"AI100")]
-        AI100 = 70,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"DT_A_K5")]
-        DT_A_K5 = 71,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"PECHNOE_TOPLIVO_BYTOVOE")]
-        PECHNOE_TOPLIVO_BYTOVOE = 72,
+        UNKNOWN = 52,
 
         [System.Runtime.Serialization.EnumMember(Value = @"NEFRAS")]
-        NEFRAS = 73,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"АВИАЦИОННОЕ_ТОПЛИВО")]
-        АВИАЦИОННОЕ_ТОПЛИВО = 74,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"PREM95")]
-        PREM95 = 75,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"SUPER98")]
-        SUPER98 = 76,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"PRIME95")]
-        PRIME95 = 77,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"PRIME98")]
-        PRIME98 = 78,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"PRIMEDTL")]
-        PRIMEDTL = 79,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"PRIMEDTZ")]
-        PRIMEDTZ = 80,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"PRIME92")]
-        PRIME92 = 81,
+        NEFRAS = 53,
 
     }
 
@@ -1423,27 +1265,27 @@ namespace Sunp.Api.Client {
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SendFlowmeterInputIndicatorsRequestBody : PackageRequestBody {
-        [Newtonsoft.Json.JsonProperty("flowmetersInputMeasurements", Required = Newtonsoft.Json.Required.Always)]
+    public partial class SendFlowmeterIndicatorsRequestBody : PackageRequestBody {
+        [Newtonsoft.Json.JsonProperty("flowmetersMeasurements", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.MinLength(1)]
-        public System.Collections.Generic.ICollection<FlowmeterInputMeasurements> FlowmetersInputMeasurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterInputMeasurements>();
+        public System.Collections.Generic.ICollection<FlowmeterMeasurements> FlowmetersMeasurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterMeasurements>();
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FlowmeterInputMeasurements {
+    public partial class FlowmeterMeasurements {
         [Newtonsoft.Json.JsonProperty("deviceId", Required = Newtonsoft.Json.Required.Always)]
         public long DeviceId { get; set; }
 
         [Newtonsoft.Json.JsonProperty("measurements", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<FlowmeterInputMeasurementData> Measurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterInputMeasurementData>();
+        public System.Collections.Generic.ICollection<FlowmeterMeasurementData> Measurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterMeasurementData>();
 
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FlowmeterInputMeasurementData {
+    public partial class FlowmeterMeasurementData {
         [Newtonsoft.Json.JsonProperty("measurementDate", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset MeasurementDate { get; set; }
@@ -1454,8 +1296,16 @@ namespace Sunp.Api.Client {
         [Newtonsoft.Json.JsonProperty("flowMass", Required = Newtonsoft.Json.Required.Always)]
         public decimal FlowMass { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("massUnitType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public MassUnitType? MassUnitType { get; set; }
+
         [Newtonsoft.Json.JsonProperty("totalVolume", Required = Newtonsoft.Json.Required.Always)]
         public decimal TotalVolume { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("volumeUnitType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public VolumeUnitType? VolumeUnitType { get; set; }
 
         [Newtonsoft.Json.JsonProperty("currentDensity", Required = Newtonsoft.Json.Required.Always)]
         public decimal CurrentDensity { get; set; }
@@ -1466,6 +1316,34 @@ namespace Sunp.Api.Client {
         [Newtonsoft.Json.JsonProperty("oilProductType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public OilProductType? OilProductType { get; set; }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum MassUnitType {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Kilogram")]
+        Kilogram = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Quintal")]
+        Quintal = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Ton")]
+        Ton = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum VolumeUnitType {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CubicMeter")]
+        CubicMeter = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CubicCentimeter")]
+        CubicCentimeter = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"CubicDecimeter")]
+        CubicDecimeter = 2,
 
     }
 
@@ -1475,53 +1353,6 @@ namespace Sunp.Api.Client {
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"\b[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}\b")]
         public string PackageId { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SendFlowmeterOutputIndicatorsRequestBody : PackageRequestBody {
-        [Newtonsoft.Json.JsonProperty("flowmetersOutputMeasurements", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        [System.ComponentModel.DataAnnotations.MinLength(1)]
-        public System.Collections.Generic.ICollection<FlowmeterOutputMeasurements> FlowmetersOutputMeasurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterOutputMeasurements>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FlowmeterOutputMeasurements {
-        [Newtonsoft.Json.JsonProperty("deviceId", Required = Newtonsoft.Json.Required.Always)]
-        public long DeviceId { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("measurements", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.Collections.Generic.ICollection<FlowmeterOutputMeasurementData> Measurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterOutputMeasurementData>();
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class FlowmeterOutputMeasurementData {
-        [Newtonsoft.Json.JsonProperty("measurementDate", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public System.DateTimeOffset MeasurementDate { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("totalMass", Required = Newtonsoft.Json.Required.Always)]
-        public decimal TotalMass { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("flowMass", Required = Newtonsoft.Json.Required.Always)]
-        public decimal FlowMass { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("totalVolume", Required = Newtonsoft.Json.Required.Always)]
-        public decimal TotalVolume { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("currentDensity", Required = Newtonsoft.Json.Required.Always)]
-        public decimal CurrentDensity { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("currentTemperature", Required = Newtonsoft.Json.Required.Always)]
-        public decimal CurrentTemperature { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("oilProductType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
-        public OilProductType? OilProductType { get; set; }
 
     }
 
@@ -1729,34 +1560,6 @@ namespace Sunp.Api.Client {
         [Newtonsoft.Json.JsonProperty("oilProductType", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public OilProductType? OilProductType { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum MassUnitType {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Kilogram")]
-        Kilogram = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Quintal")]
-        Quintal = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"Ton")]
-        Ton = 2,
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum VolumeUnitType {
-
-        [System.Runtime.Serialization.EnumMember(Value = @"CubicMeter")]
-        CubicMeter = 0,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"CubicCentimeter")]
-        CubicCentimeter = 1,
-
-        [System.Runtime.Serialization.EnumMember(Value = @"CubicDecimeter")]
-        CubicDecimeter = 2,
 
     }
 

@@ -97,30 +97,6 @@ namespace Service.Clients.OPC {
             return decimal.Parse(result, CultureInfo.InvariantCulture);
         }
 
-        public static OilProductType TryGetOilProductType(ItemValueResult[] itemValueResults, string searchedItemName, Logger logger) {
-            var result = CommonHelpers.GetValueByName(itemValueResults, searchedItemName, logger).Value;
-            if (string.IsNullOrEmpty(ToSafeString(result))) {
-                logger.Error("Param {0} Result is null or Empty", searchedItemName, result);
-                throw new InvalidOperationException();
-            }
-            switch (ToSafeString(result)) {
-                case "1":
-                    return OilProductType.AI76;
-                case "2":
-                    return OilProductType.AI80;
-                case "10":
-                    return OilProductType.AI95;
-                case "11":
-                    return OilProductType.AI_92;
-                case "20":
-                    return OilProductType.DT;
-                case "40":
-                    return OilProductType.TS1;
-                default:
-                    return OilProductType.UNKNOWN;
-            };
-        }
-
         public static DateTime TryGetDateTime(ItemValueResult[] itemValueResults, string searchedItemName, Logger logger) {
             var result = CommonHelpers.GetValueByName(itemValueResults, searchedItemName, logger);
             DateTime dateStamp;
