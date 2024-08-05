@@ -1,6 +1,7 @@
 ﻿using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
+using Service.Common;
 using Sunp.Api.Client;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace Service.Clients.VR {
                     if (_tankMeasurements.Any()) {
                         tanksMeasurements.Add(new TankMeasurements() {
                             TankId = source.ExternalId.Value,
-                            Measurements = _tankMeasurements
+                            Measurements = _tankMeasurements.SetEnums(source)
                         });
                     }
 
@@ -76,13 +77,13 @@ namespace Service.Clients.VR {
                     if (transfersWithEndDate.Any()) {
                         tanksTransfers.Add(new TankTransfers {
                             TankId = source.ExternalId.Value,
-                            Transfers = transfersWithEndDate
+                            Transfers = transfersWithEndDate.SetEnums(source)
                         });
                     }
                 }
 
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
             } catch (Exception ex) {
                 Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
             }

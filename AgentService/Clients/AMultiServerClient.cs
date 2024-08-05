@@ -205,35 +205,32 @@ namespace Service.Clients.Client {
 
         private bool ConnectIp()
         {
-            try
-            {
-                var ipHostInfo = Dns.GetHostEntry(ObjectSettings.IpConnectionConfig.IpAddress);
-                var ipAddress = ipHostInfo.AddressList[0];
-
-                if (!ObjectSettings.IpConnectionConfig.Port.HasValue || !Regex.IsMatch(ObjectSettings.IpConnectionConfig.Port.Value.ToString(), @"^\d{1,5}$", RegexOptions.None))
-                {
+            try {
+                if (!IPAddress.TryParse(ObjectSettings.IpConnectionConfig.IpAddress, out IPAddress ipAddress)) {
+                    Logger.Error("Invalid IP address: {0}", ObjectSettings.IpConnectionConfig.IpAddress);
                     return false;
                 }
-                var port = ObjectSettings.IpConnectionConfig.Port.Value.ToString();
-                var ep = new IPEndPoint(ipAddress, int.Parse(port));
+
+                if (!ObjectSettings.IpConnectionConfig.Port.HasValue ||
+                    !Regex.IsMatch(ObjectSettings.IpConnectionConfig.Port.Value.ToString(), @"^\d{1,5}$", RegexOptions.None)) {
+                    Logger.Error("Invalid port: {0}", ObjectSettings.IpConnectionConfig.Port);
+                    return false;
+                }
+
+                int port = ObjectSettings.IpConnectionConfig.Port.Value;
+                var ep = new IPEndPoint(ipAddress, port);
 
                 _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
                 _socket.Connect(ep);
                 Logger.Info($"Socket connected to {_socket.RemoteEndPoint}");
-            }
-            catch (ArgumentNullException ane)
-            {
+            } catch (ArgumentNullException ane) {
                 Logger.Error("ArgumentNullException : {0}", ane);
                 return false;
-            }
-            catch (SocketException se)
-            {
+            } catch (SocketException se) {
                 Logger.Error("{0}:{1} SocketException : {2}", ObjectSettings.IpConnectionConfig.IpAddress, ObjectSettings.IpConnectionConfig.Port.Value, se);
                 return false;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 Logger.Error("Unexpected exception : {0}", e.Message + e.StackTrace);
                 return false;
             }
@@ -352,24 +349,22 @@ namespace Service.Clients.Client {
         #region utils
         protected DateTime? FillDT(int nom)
         {
-            try
-            {
-                int mm, dd, yy, hh, mn;
-                DateTime? result = null;
+            try {
+                var mm = GetValue(nom, 2);
+                var dd = GetValue(nom + 2, 2);
+                var yy = GetValue(nom + 4, 2);
+                var hh = GetValue(nom + 6, 2);
+                var mn = GetValue(nom + 8, 2);
+                if (yy + 2000 > DateTime.Now.Year || mm > 12 || dd > 31 || hh > 24 || mn > 59) {
+                    return null;
+                }
 
-                mm = GetValue(nom, 2);
-                dd = GetValue(nom + 2, 2);
-                yy = GetValue(nom + 4, 2);
-                hh = GetValue(nom + 6, 2);
-                mn = GetValue(nom + 8, 2);
-                result = new DateTime(yy + 2000, mm, dd, hh, mn, 0, 0);
-                return result;
+                return new DateTime(yy + 2000, mm, dd, hh, mn, 0, 0);
             }
-            catch (Exception e)
-            {
-                Logger.Error("error on fillDT {0}", e);
+            catch (Exception e) {
+                Logger.Error($"error on fillDT {e.Message + e.StackTrace}");
+                return null;
             }
-            return null;
         }
 
         protected int GetValue(int nom, int kol)

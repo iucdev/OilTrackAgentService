@@ -1,6 +1,7 @@
 ﻿using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
+using Service.Common;
 using Sunp.Api.Client;
 using System;
 using System.Collections.Generic;
@@ -70,14 +71,14 @@ namespace Service.Clients.IGLA {
                                 Temperature = decimal.Parse(ToSafeString(Tofloat4(27)), CultureInfo.InvariantCulture),
                                 Level = decimal.Parse(ToSafeString(Tofloat4(11)), CultureInfo.InvariantCulture)
                             }
-                        };
+                        }.SetEnums(source);
 
                         tanksMeasurements.Add(tankMeasurements);
                     } catch (Exception e) {
                         Logger.Error($"Error on FullInfoCMD Message-{e.Message + e.StackTrace}");
                     }
                 }
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
             } catch (Exception ex) { 
                 Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
             }

@@ -3,16 +3,14 @@ using Opc.Da;
 using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
-using Service.Enums;
+using Service.Common;
 using Sunp.Api.Client;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Service.Clients.OPC {
     public class OpcMultiServerClient : AMultiServerClient
@@ -241,13 +239,13 @@ namespace Service.Clients.OPC {
                 measurement.Temperature = CommonHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Temperature, Logger);
                 measurement.Density = CommonHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Density, Logger);
                 measurement.Volume = CommonHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Volume, Logger);
-                measurement.VolumeUnitType = VolumeUnitType.CubicMeter;
                 measurement.Mass = CommonHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Mass, Logger);
-                measurement.MassUnitType = MassUnitType.Kilogram;
                 measurement.Level = CommonHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Level, Logger);
-                measurement.LevelUnitType = LevelUnitType.Millimeter;
                 measurement.MeasurementDate = string.IsNullOrEmpty(tankParams.DateTimeStamp) ? now : CommonHelpers.TryGetDateTime(tankMeasurementResults, tankParams.DateTimeStamp, Logger);
-                measurement.OilProductType = source.OilProductType.Value;//CommonHelpers.TryGetOilProductType(results, tankParams.ProductName, Logger);
+                measurement.OilProductType = source.OilProductType;
+                measurement.VolumeUnitType = source.VolumeUnitType;
+                measurement.LevelUnitType = source.LevelUnitType;
+                measurement.MassUnitType = source.MassUnitType;
 
                 var tableBuilder = new StringBuilder();
                 tableBuilder.AppendLine("Measurement Values:");
@@ -264,7 +262,7 @@ namespace Service.Clients.OPC {
 
                 Logger.Debug(itemsStr);
                 Logger.Debug(tableBuilder.ToString());
-                tankMeasurements.Measurements.Add(measurement);
+                tankMeasurements.Measurements = new[] { measurement }.SetEnums(source);
                 Logger.Debug("Tank Measurement Model Filled with values");
                 tanksMeasurements.Add(tankMeasurements);
                 Logger.Debug("Keep Filling List");
@@ -285,25 +283,18 @@ namespace Service.Clients.OPC {
 
                 var transferParams = source.TankTransferParams;
 
-                //transfer.Density = CommonHelpers.TryGetDecimal(results, transferParams.Density, Logger);
                 Logger.Debug("Start Filling Decimals into Model");
                 transfer.VolumeStart = CommonHelpers.TryGetDecimal(tankTransferResult, transferParams.VolumeStart, Logger);
                 transfer.VolumeEnd = CommonHelpers.TryGetDecimal(tankTransferResult, transferParams.VolumeFinish, Logger);
-                transfer.VolumeUnitType = VolumeUnitType.CubicMeter;
                 transfer.MassStart = CommonHelpers.TryGetDecimal(tankTransferResult, transferParams.MassStart, Logger);
                 transfer.MassEnd = CommonHelpers.TryGetDecimal(tankTransferResult, transferParams.MassFinish, Logger);
-                transfer.MassUnitType = MassUnitType.Kilogram;
                 transfer.LevelStart = CommonHelpers.TryGetDecimal(tankTransferResult, transferParams.LevelStart, Logger);
                 transfer.LevelEnd = CommonHelpers.TryGetDecimal(tankTransferResult, transferParams.LevelFinish, Logger);
-                transfer.LevelUnitType = LevelUnitType.Millimeter;
                 Logger.Debug("Finish Filling Decimals into Model");
                 Logger.Debug("Start Filling Dates into Model");
                 transfer.StartDate = CommonHelpers.TryGetDateTime(tankTransferResult, transferParams.StartTime, Logger);
                 transfer.EndDate = CommonHelpers.TryGetDateTime(tankTransferResult, transferParams.EndTime, Logger);
                 Logger.Debug("Finish Filling Dates into Model");
-                Logger.Debug("Start Filling OilProduct into Model");
-                transfer.OilProductType = source.OilProductType.Value;
-                Logger.Debug("Finish Filling OilProduct into Model");
                 transfer.OperationType = transfer.LevelStart < transfer.LevelEnd ? TransferOperationType.Outcome : TransferOperationType.Income;
                 if (transfer.StartDate.DateTime <= DateTime.MinValue || transfer.EndDate.DateTime <= DateTime.MinValue) {
                     throw new Exception($"StartDate {transfer.StartDate}, EndDate {transfer.EndDate}. Date error");
@@ -323,7 +314,7 @@ namespace Service.Clients.OPC {
                 tableBuilder.AppendLine($"OilProductType: {transfer.OilProductType}");
 
                 Logger.Debug(tableBuilder.ToString());
-                tankTransfers.Transfers = new[] { transfer };
+                tankTransfers.Transfers = new[] { transfer }.SetEnums(source);
                 Logger.Debug("Transfer Measurement Model Filled with values");
                 tanksTransfers.Add(tankTransfers);
                 Logger.Debug("Keep Filling List");
@@ -358,16 +349,11 @@ namespace Service.Clients.OPC {
                     return;
                 }
 
-                var tanksMeasurements = new List<TankMeasurements>();
-                var tanksTransfers = new List<TankTransfers>();
-                foreach (var source in ObjectSettings.Objects.First().ObjectSources) {
-                    Logger.Debug($"Object ID {ObjectSettings.Objects.First().ObjectId}");
-                    tanksMeasurements.AddRange(collectTankMeasurements(tankMeasurementResults));
-                    tanksTransfers.AddRange(collectTankTransfers(tankTransferResults));
-                }
+                var tanksMeasurements = collectTankMeasurements(tankMeasurementResults).ToList();
+                var tanksTransfers = collectTankTransfers(tankTransferResults).ToList();
 
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
             } catch (Exception e) {
                 Logger.Error(e.StackTrace);
             }

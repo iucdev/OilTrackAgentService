@@ -1,23 +1,11 @@
-﻿using Dapper;
-using MySql.Data.MySqlClient;
-using Oracle.DataAccess.Client;
-using Service.Clients.Client;
+﻿using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
 using Service.Enums;
-using Service.LocalDb;
 using Sunp.Api.Client;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
-using System.Globalization;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Messaging;
-using System.Threading.Tasks;
-using static Dapper.SqlMapper;
 
 namespace Service.Clients.DBO {
     public class DboMultiServerClientV2 : AMultiServerClient
@@ -52,8 +40,8 @@ namespace Service.Clients.DBO {
                     );
                 }
 
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
             } catch (Exception ex) { 
                 Logger.Error($"Collect data error {ex.Message + ex.StackTrace}");
             }

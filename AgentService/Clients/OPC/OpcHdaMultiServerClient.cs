@@ -10,6 +10,7 @@ using System.Net;
 using System.Threading;
 using System.Text;
 using Service.LocalDb;
+using Service.Common;
 
 namespace Service.Clients.OPC {
     public class OpcHdaMultiServerClient : AMultiServerClient {
@@ -110,7 +111,7 @@ namespace Service.Clients.OPC {
 
                 // для всех КПУ (расходомеров/уровнемеров)
                 foreach (var source in ObjectSettings.Objects.First().ObjectSources.Where(s => s.TankMeasurementParams != null)) {
-                    var lastSyncDate = LastSyncRecord.Get(source.InternalId, source.ExternalId.Value);
+                    var lastSyncDate = LastSyncRecord.Get(source.InternalId, source.ExternalId.Value, Logger);
                     // create tags
                     group = new Trend(_hdaServer);
 
@@ -163,10 +164,11 @@ namespace Service.Clients.OPC {
                     };
 
                     tankMeasurements.Measurements.Add(measurement);
+                    tankMeasurements.Measurements = tankMeasurements.Measurements.ToArray().SetEnums(source);
                     tanksMeasurements.Add(tankMeasurements);
                     group = null;
                 }
-                QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
             } catch (Exception ex) {
                 Logger.Error(ex);
             }

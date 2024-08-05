@@ -2,6 +2,7 @@
 using Service.Clients.ModBus;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
+using Service.Common;
 using Sunp.Api.Client;
 using System;
 using System.Collections.Generic;
@@ -71,7 +72,7 @@ namespace Service.Clients.SENS {
                             continue;
                         }
 
-                        var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value, Measurements = new List<TankMeasurementData>() };
+                        var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value };
 
                         try {
                             var measurement = new TankMeasurementData();
@@ -97,7 +98,7 @@ namespace Service.Clients.SENS {
                                 measurement.Density = decimal.Parse(ToSafeString(Tofloat(25)), CultureInfo.InvariantCulture);
 
                             measurement.MeasurementDate = DateTime.Now; //Т.к. протоколом не предусмотрены метки и ЦБУ отвечает практически моментально то дату можем ставить сами.
-                            tankMeasurements.Measurements.Add(measurement);
+                            tankMeasurements.Measurements = new[] { measurement }.SetEnums(source);
 
                             tanksMeasurements.Add(tankMeasurements);
                         } catch (Exception e) {
@@ -107,7 +108,7 @@ namespace Service.Clients.SENS {
                 }
 
                 try {
-                    QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
+                    QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
                 } catch (Exception ex) {
                     Logger.Error($"SendSourceValues error {ex.Message + ex.StackTrace}");
                 }

@@ -1,6 +1,8 @@
-﻿using Service.Clients.Client;
+﻿using Newtonsoft.Json;
+using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
+using Service.Common;
 using Service.Enums;
 using Sunp.Api.Client;
 using System;
@@ -90,6 +92,8 @@ namespace Service.Clients.PV4 {
                         continue;
                     }
 
+                    value.ExternalId = source.ExternalId.Value;
+                    value.ObjectSource = source;
                     value.Data.Mass = pr.Data.Mass;
 
                     ProductDensityCMD(value.SourceName.PadLeft(2, '0'));
@@ -100,7 +104,7 @@ namespace Service.Clients.PV4 {
                         value.SourceName, value.Data.Level, value.Data.Volume, value.Data.Temperature, value.Data.Mass, value.Data.Density);
                 }
 
-                tankMeasurements.Measurements = _tankLevelsSourceValue.Select(t => t.Data).ToList();
+                tankMeasurements.Measurements = _tankLevelsSourceValue.Select(t => t.Data).ToList().SetEnums(source);
                 return tankMeasurements;
             } catch (Exception ex) {
                 Logger.Error($"Error on collect measurements: {ex.Message + ex.StackTrace}");
@@ -121,7 +125,7 @@ namespace Service.Clients.PV4 {
                         _tankTransfers = null;
                     }
                     if (_tankTransfers != null && _tankTransfers.Count > 0) {
-                        tankTransfers.Transfers = _tankTransfers.Where(t => t.EndDate != null).ToArray();
+                        tankTransfers.Transfers = _tankTransfers.Where(t => t.EndDate != null).ToArray().SetEnums(tankMeasurementDataPv4Dto.ObjectSource);
                     }
                 }
                 return tankTransfers;
@@ -138,7 +142,7 @@ namespace Service.Clients.PV4 {
                     var tanksMeasurements = new List<TankMeasurements>();
                     var tanksTransfers = new List<TankTransfers>();
 
-                    foreach (var source in @object.ObjectSources.Where(s => s.TankMeasurementParams != null)) {
+                    foreach (var source in @object.ObjectSources) {
                         var measurements = collectMeasurements(source);
                         if (measurements != null) {
                             tanksMeasurements.Add(measurements);
@@ -152,8 +156,8 @@ namespace Service.Clients.PV4 {
                         }
                     }
 
-                    QueueTaskService.Instance.SaveAsTask(tanksMeasurements.ToArray());
-                    QueueTaskService.Instance.SaveAsTask(tanksTransfers.ToArray());
+                    QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                    QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
                 }
             } catch (Exception ex) {
                 Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
@@ -631,6 +635,7 @@ namespace Service.Clients.PV4 {
         class TankMeasurementDataPv4Dto {
             public long ExternalId { get; set; }
             public string SourceName { get; set; }
+            public ObjectSource ObjectSource { get; set; }
             public TankMeasurementData Data { get; set; }
         }
 

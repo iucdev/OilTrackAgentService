@@ -189,6 +189,7 @@
     <Compile Include="Clients\AMultiServerClient.cs" />
     <Compile Include="Clients\Etalon\EtalonMultiServerClient.cs" />
     <Compile Include="Clients\PI\PiMultiServerClientHelpers.cs" />
+    <Compile Include="Common\CommonHelper.cs" />
     <Compile Include="Common\SunpApiClient.cs" />
     <Compile Include="Common\CustomAppender.cs" />
     <Compile Include="Clients\DBO\DboConnectionHelpers.cs" />
@@ -208,10 +209,10 @@
     <Compile Include="Clients\PV4\Pv4Cmd.cs" />
     <Compile Include="Clients\PV4\Pv4MultiServerClient.cs" />
     <Compile Include="Clients\RSMDB\RSMDBProxy.cs" />
-    <Compile Include="Clients\Scheduler\Job.cs" />
-    <Compile Include="Clients\Scheduler\JobManager.cs" />
-    <Compile Include="Clients\Scheduler\MultiThreadClientJob.cs" />
-    <Compile Include="Clients\Scheduler\QueueTaskJob.cs" />
+    <Compile Include="Common\Scheduler\Job.cs" />
+    <Compile Include="Common\Scheduler\JobManager.cs" />
+    <Compile Include="Common\Scheduler\MultiThreadClientJob.cs" />
+    <Compile Include="Common\Scheduler\QueueTaskJob.cs" />
     <Compile Include="Clients\SENS\SensMultiServerClient.cs" />
     <Compile Include="Common\LocalDb\LastSyncRecord.cs" />
     <Compile Include="Common\Enums.cs" />

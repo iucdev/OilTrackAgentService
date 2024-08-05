@@ -36,69 +36,114 @@ namespace Service.Clients.Utils {
 
         public QueueTaskRecord GetNextTask(Logger logger)
         {
-            lock (syncRoot) {
-                var latestTask = QueueTaskRecord.GetFirstTaskFromDb();
+            try {
+                _logger.Debug($"QueueTaskService->GetNextTask call");
+                lock (syncRoot) {
+                    var latestTask = QueueTaskRecord.GetFirstTaskFromDb(_logger);
 
-                if (latestTask == null) { 
-                    logger.Info($"Task not found");
-                    return null;
+                    if (latestTask == null) {
+                        logger.Debug($"QueueTaskService->GetNextTask success");
+                        return null;
+                    }
+
+                    logger.Debug($"QueueTaskService->GetNextTask success");
+                    return latestTask;
                 }
-
-                return latestTask;
+            } catch (Exception ex) { 
+                _logger.Error($"QueueTaskService->GetNextTask exception: {ex.Message + ex.StackTrace}");
+                throw ex;
             }
         }
 
-        public void SaveAsTask(TankTransfers[] items) {
-            lock (syncRoot) {
-                var newTask = new QueueTaskRecord {
-                    CreateDate = DateTime.Now,
-                    Type = QueueTaskType.SendTankTransfer,
-                    Status = QueueTaskStatus.InProcess,
-                    Items = JsonConvert.SerializeObject(items),
-                };
-                newTask.AddToDb();
+        public void SaveTransfersAsTask(TankTransfers[] items) {
+            try {
+                _logger.Debug($"QueueTaskService->SaveTransfersAsTask call ({JsonConvert.SerializeObject(items)})");
+                var toSave = items
+                    .Where(t => t.Transfers.Any())
+                    .Select(item => {
+                        var lastSyncDate = LastSyncRecord.GetByExternalId(item.TankId, _logger).LastTransfersSyncDate;
+                        var transfers = item.Transfers.Where(transfer => transfer.EndDate > lastSyncDate).ToList();
+                        item.Transfers = transfers;
+                        return item;
+                    });
+                if (!toSave.Any()) {
+                    return;
+                }
+                lock (syncRoot) {
+                    var newTask = new QueueTaskRecord
+                    {
+                        CreateDate = DateTime.Now,
+                        Type = QueueTaskType.SendTankTransfer,
+                        Status = QueueTaskStatus.InProcess,
+                        Items = JsonConvert.SerializeObject(toSave),
+                    };
+                    newTask.AddToDb(_logger);
+                }
+                _logger.Debug($"QueueTaskService->SaveTransfersAsTask success");
+            } catch (Exception ex) {
+                _logger.Error($"QueueTaskService->SaveTransfersAsTask exception: {ex.Message + ex.StackTrace}");
+                throw ex;
             }
         }
 
-        public void SaveAsTask(TankMeasurements[] items) {
-            lock (syncRoot) {
-                var newTask = new QueueTaskRecord {
-                    CreateDate = DateTime.Now,
-                    Type = QueueTaskType.SendTankMeasurements,
-                    Status = QueueTaskStatus.InProcess,
-                    Items = JsonConvert.SerializeObject(items),
-                };
-                newTask.AddToDb();
+        public void SaveMeasurementsAsTask(TankMeasurements[] items) {
+            try {
+                _logger.Debug($"QueueTaskService->SaveMeasurementsAsTask call ({JsonConvert.SerializeObject(items)})");
+                var toSave = items
+                    .Where(t => t.Measurements.Any())
+                    .Select(item => {
+                        var lastSyncDate = LastSyncRecord.GetByExternalId(item.TankId, _logger).LastMeasurementsSyncDate;
+                        var measurements = item.Measurements.Where(measurement => measurement.MeasurementDate > lastSyncDate).ToList();
+                        item.Measurements = measurements;
+                        return item;
+                    });
+                if (!toSave.Any()) {
+                    return;
+                }
+                lock (syncRoot) {
+                    var newTask = new QueueTaskRecord
+                    {
+                        CreateDate = DateTime.Now,
+                        Type = QueueTaskType.SendTankMeasurements,
+                        Status = QueueTaskStatus.InProcess,
+                        Items = JsonConvert.SerializeObject(toSave),
+                    };
+                    newTask.AddToDb(_logger);
+                }
+                _logger.Debug($"QueueTaskService->SaveMeasurementsAsTask success");
+            } catch (Exception ex){
+                _logger.Error($"QueueTaskService->SaveMeasurementsAsTask exception: {ex.Message + ex.StackTrace}");
+                throw ex;
             }
         }
 
         public void RemoveTask(QueueTaskRecord task)
         {
-            lock (syncRoot)
-            {
-                try {
-                    _logger.Info($"Try to remove done task with Id: {task.Id}");
-                    task.DeleteFromDb();
-                    _logger.Info($"Task with Id {task.Id} removed");
-                } catch (Exception ex) {
-                    _logger.Error($"Error on remove task with Id: {task.Id}: {ex.Message + ex.StackTrace}");
-                    throw ex;
+            try {
+                _logger.Debug($"QueueTaskService->RemoveTask call ({JsonConvert.SerializeObject(task)})");
+                lock (syncRoot) {
+                    task.DeleteFromDb(_logger);
                 }
+                _logger.Debug($"QueueTaskService->RemoveTask success");
+            } catch (Exception ex) {
+                _logger.Error($"QueueTaskService->RemoveTask exception: {ex.Message + ex.StackTrace}");
+                throw ex;
             }
         }
 
-        public void AbandonTask(QueueTaskRecord task, string error) {
-            lock (syncRoot) {
-                try {
-                    _logger.Info($"Try to abandon task with Id: {task.Id}");
+        public void AbandonTask(QueueTaskRecord task, string error)
+        {
+            try {
+                _logger.Debug($"QueueTaskService->AbandonTask call ({JsonConvert.SerializeObject(task)})");
+                lock (syncRoot) {
                     task.Status = QueueTaskStatus.Abandon;
-                    task.Error = error; 
-                    task.UpdateInDb();
-                    _logger.Info($"Task with Id {task.Id} abandoned");
-                } catch (Exception ex) {
-                    _logger.Error($"Error on try to abandon task with Id {task.Id}: {ex.Message + ex.StackTrace}");
-                    throw ex;
+                    task.Error = error;
+                    task.UpdateInDb(_logger);
                 }
+                _logger.Debug($"QueueTaskService->AbandonTask success");
+            } catch (Exception ex) {
+                _logger.Error($"QueueTaskService->AbandonTask exception: {ex.Message + ex.StackTrace}");
+                throw ex;
             }
         }
     }
