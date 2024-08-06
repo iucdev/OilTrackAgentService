@@ -225,34 +225,34 @@ namespace Service.Clients.VR {
                 }
 
                 var dt = fillDTVR(7);
+                if (dt is null) {
+                    return tankMeasurements;
+                }
                 var pos = 17;
 
                 while (buf[pos] != 0x26) {
-                    var measurement = new TankMeasurementData {
-                        MeasurementDate = dt.Value
-                    };
+                    var measurement = new TankMeasurementData { MeasurementDate = dt.Value };
 
                     var n = GetValue(pos + 7, 2);
                     pos += 9;
 
                     for (var i = 0; i < n; i++) {
-                        float si;
+                        decimal si;
                         try {
-                            si = Tofloat(pos);
+                            si = ToDecimal(pos);
                         } catch (Exception e) {
                             Logger.Error(e);
                             return tankMeasurements;
                         }
 
                         pos += 8;
-                        var result = decimal.Parse(si.ToString("F4").Replace(',', '.'), CultureInfo.InvariantCulture);
 
                         switch (i) {
-                            case 0: measurement.Volume = result; break;
-                            case 3: measurement.Level = result; break;
-                            case 5: measurement.Temperature = result; break;
-                            case 10: measurement.Mass = result; break;
-                            case 11: measurement.Density = result; break;
+                            case 0: measurement.Volume = si; break;
+                            case 3: measurement.Level = si; break;
+                            case 5: measurement.Temperature = si; break;
+                            case 10: measurement.Mass = si; break;
+                            case 11: measurement.Density = si; break;
                         }
                     }
 
@@ -293,28 +293,29 @@ namespace Service.Clients.VR {
                         var dt2 = fillDTVR(pos);
                         pos += 10;
 
-                        transfer.StartDate = dt1 != null ? dt1.Value : DateTime.MinValue;
-                        transfer.EndDate = dt2 != null ? dt2.Value : DateTime.MinValue;
+                        if (!dt1.HasValue || !dt2.HasValue) {
+                            return tankTransfers;
+                        }
 
-                        var line = string.Format("{0,-11}| {1,-10}", transfer.StartDate, transfer.EndDate);
+                        transfer.StartDate = dt1.Value;
+                        transfer.EndDate = dt2.Value;
 
-                        float sVol = 0, eVol = 0, sMass = 0, eMass = 0, sLevel = 0, eLevel = 0;
+                        decimal sVol = 0, eVol = 0, sMass = 0, eMass = 0, sLevel = 0, eLevel = 0;
 
                         var nn = GetValue(pos, 2);
                         nn = int.Parse(nn.ToString(CultureInfo.InvariantCulture), NumberStyles.HexNumber);
                         pos += 2;
 
                         for (var j = 0; j < nn; j++) {
-                            float si;
+                            decimal si;
                             try {
-                                si = Tofloat(pos);
+                                si = ToDecimal(pos);
                             } catch (Exception e) {
                                 Logger.Error(e);
                                 return tankTransfers;
                             }
                             pos += 8;
-                            line += string.Format("| {0,-10}", si);
-
+                            
                             switch (j) {
                                 case 0: sVol = si; break;
                                 case 1: sMass = si; break;
@@ -325,14 +326,12 @@ namespace Service.Clients.VR {
                             }
                         }
 
-                        transfer.VolumeStart = (decimal)sVol;
-                        transfer.VolumeEnd = (decimal)eVol;
-                        transfer.MassStart = (decimal)(sMass);
-                        transfer.MassEnd = (decimal)(eMass);
-                        transfer.LevelStart = (decimal)(sLevel);
-                        transfer.LevelEnd = (decimal)(eLevel);
-
-                        line += string.Format("| {0,5}", buf[pos]);
+                        transfer.VolumeStart = sVol;
+                        transfer.VolumeEnd = eVol;
+                        transfer.MassStart = sMass;
+                        transfer.MassEnd = eMass;
+                        transfer.LevelStart = sLevel;
+                        transfer.LevelEnd = eLevel;
 
                         pos++;
 
@@ -349,52 +348,51 @@ namespace Service.Clients.VR {
         }
 
         private List<TankMeasurementData> Fill201() {
-            var measurementRecords = new List<TankMeasurementData>();
+            var tankMeasurements = new List<TankMeasurementData>();
             try {
                 if (!((buf[0] == 01) && (buf[1] == 0x69) && (buf[2] == 0x32) && (buf[3] == 0x30) && (buf[4] == 0x31))) {
                     Logger.Error("Error F201");
-                    return measurementRecords;
+                    return tankMeasurements;
                 }
 
                 var dt = fillDTVR(7);
+                if (!dt.HasValue) {
+                    return tankMeasurements;
+                }
                 var pos = 17;
 
                 while (buf[pos] != 0x26) {
-                    var measurement = new TankMeasurementData
-                    {
-                        MeasurementDate = dt.Value
-                    };
+                    var measurement = new TankMeasurementData { MeasurementDate = dt.Value };
 
                     var n = GetValue(pos + 7, 2);
                     pos += 9;
 
                     for (var i = 0; i < n; i++) {
-                        float si;
+                        decimal si;
                         try {
-                            si = Tofloat(pos);
+                            si = ToDecimal(pos);
                         } catch (Exception e) {
                             Logger.Error(e);
-                            return measurementRecords;
+                            return tankMeasurements;
                         }
 
                         pos += 8;
-                        var result = decimal.Parse(si.ToString("F4").Replace(',', '.'));
 
                         switch (i) {
-                            case 0: measurement.Volume = result; break;
-                            case 3: measurement.Level = result; break;
-                            case 5: measurement.Temperature = result; break;
-                            case 10: measurement.Mass = result; break;
-                            case 11: measurement.Density = result; break;
+                            case 0: measurement.Volume = si; break;
+                            case 3: measurement.Level = si; break;
+                            case 5: measurement.Temperature = si; break;
+                            case 10: measurement.Mass = si; break;
+                            case 11: measurement.Density = si; break;
                         }
                     }
-                    measurementRecords.Add(measurement);
+                    tankMeasurements.Add(measurement);
                 }
             } catch (Exception e) {
                 Logger.Error(e);
             }
 
-            return measurementRecords;
+            return tankMeasurements;
         }
 
         #endregion
@@ -402,29 +400,30 @@ namespace Service.Clients.VR {
         #region utils
 
         private DateTime? fillDTVR(int nom) {
-            int mm, dd, yy, hh, mn;
-            DateTime? result = null;
             try {
-                yy = GetValue(nom, 2);
-                mm = GetValue(nom + 2, 2);
-                dd = GetValue(nom + 4, 2);
-                hh = GetValue(nom + 6, 2);
-                mn = GetValue(nom + 8, 2);
-                result = new DateTime(yy + 2000, mm, dd, hh, mn, 0, 0);
+                var yy = GetValue(nom, 2);
+                var mm = GetValue(nom + 2, 2);
+                var dd = GetValue(nom + 4, 2);
+                var hh = GetValue(nom + 6, 2);
+                var mn = GetValue(nom + 8, 2);
+                if (yy + 2000 > DateTime.Now.Year || mm > 12 || dd > 31 || hh > 24 || mn > 60) {
+                    return null;
+                }
+                return new DateTime(yy + 2000, mm, dd, hh, mn, 0, 0);
             } catch (Exception e) {
-                Logger.Error($"Error on fillDTVR {e.Message + e.StackTrace}");
+                Logger.Error($"error on fillDTVR {e.Message + e.StackTrace}");
+                return null;
             }
-            return result;
         }
 
-        float Tofloat(int pos) {
+        decimal ToDecimal(int pos) {
             var raw = new byte[4];
             raw[3] = Convert.ToByte(((char)buf[pos]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 1]).ToString(CultureInfo.InvariantCulture), 16);
             raw[2] = Convert.ToByte(((char)buf[pos + 2]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 3]).ToString(CultureInfo.InvariantCulture), 16);
             raw[1] = Convert.ToByte(((char)buf[pos + 4]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 5]).ToString(CultureInfo.InvariantCulture), 16);
             raw[0] = Convert.ToByte(((char)buf[pos + 6]).ToString(CultureInfo.InvariantCulture) + ((char)buf[pos + 7]).ToString(CultureInfo.InvariantCulture), 16);
-
-            return BitConverter.ToSingle(raw, 0);
+            var floatValue = BitConverter.ToSingle(raw, 0);
+            return (decimal)floatValue;
         }
 
         private static byte[] signHmacSha256(string key, byte[] message) {

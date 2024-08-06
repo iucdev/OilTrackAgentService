@@ -262,7 +262,6 @@ namespace Service.Clients.Fafnir {
 
                 while (buf[pos] != 0x26) {
                     var measurement = new TankMeasurementData { MeasurementDate = dt.Value };
-                    var tanknum = GetValue(pos, 2);
 
                     var n = GetValue(pos + 7, 2);
                     pos += 9;
@@ -313,7 +312,6 @@ namespace Service.Clients.Fafnir {
 
                 while (buf[pos] != 0x26) {
                     var measurement = new TankMeasurementData { MeasurementDate = dt.Value };
-                    var tanknum = GetValue(pos, 2);
 
                     var n = GetValue(pos + 7, 2);
                     pos += 9;
@@ -346,8 +344,7 @@ namespace Service.Clients.Fafnir {
             return tankMeasurements;
         }
 
-        private List<TankTransferData> Fill215()
-        {
+        private List<TankTransferData> Fill215() {
             var tankTransfers = new List<TankTransferData>();
 
             try {
