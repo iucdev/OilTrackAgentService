@@ -288,6 +288,17 @@
   </Target>
   <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
   <Import Project="..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net451\Stub.System.Data.SQLite.Core.NetFramework.targets" Condition="Exists('..\packages\Stub.System.Data.SQLite.Core.NetFramework.1.0.118.0\build\net451\Stub.System.Data.SQLite.Core.NetFramework.targets')" />
+   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <PropertyGroup>
+      <BuildPath>$(TargetDir)Service.exe</BuildPath>
+      <InstallBatPath>$(TargetDir)install.bat</InstallBatPath>
+      <UninstallBatPath>$(TargetDir)uninstall.bat</UninstallBatPath>
+    </PropertyGroup>
+    <Exec Command="echo &quot;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\InstallUtil.exe&quot; /i &quot;$(BuildPath)&quot; &gt; &quot;$(InstallBatPath)&quot;" />
+    <Exec Command="echo pause &gt;&gt; &quot;$(InstallBatPath)&quot;" />
+    <Exec Command="echo &quot;C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\InstallUtil.exe&quot; /u &quot;$(BuildPath)&quot; &gt; &quot;$(UninstallBatPath)&quot;" />
+    <Exec Command="echo pause &gt;&gt; &quot;$(UninstallBatPath)&quot;" />
+  </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
