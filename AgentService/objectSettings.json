@@ -1,0 +1,87 @@
+{
+  "ShowDebugLogs": "true",
+  "ApiUrl": "Ссылка до Api, значение string",
+  "ApiToken": "Bearer токен от Api, значение string",
+  "ConnectionType": "Ip",
+  "IpConnectionConfig": {
+    "IpAddress": "IP адрес, значение string",
+    "Port": "1",
+    "RSMDBConnectionString": "Строка подключения string RSMDB, значение string",
+    "DComUid": "DComUid, значение string",
+    "DComPwd": "DComPwd, значение string"
+  },
+  "ClientType": "VrClient",
+  "Objects": [
+    {
+      "ObjectId": "1",
+      "ObjectSources": [
+        {
+          "InternalId": "1",
+          "ExternalId": "1",
+          "OilProductType": "AI95",
+          "VolumeUnitType": "CubicMeter",
+          "MassUnitType": "Kilogram",
+          "LevelUnitType": "Millimeter"
+        }
+      ]
+    }
+  ],
+  "StartFrom": "2024-05-05",
+  // необходимо заполнить маппинг по виду нефтепродукта ниже, если источник данных OPC или DBO, иначе можно удалить
+  "OilProductTypeMapping": {
+    "AI76": "AI76",
+    "AI91": "AI76",
+    "AI92": "AI76",
+    "AI92K5": "AI76",
+    "AI95": "AI76",
+    "AI95K5": "AI76",
+    "AI95PRIME": "AI76",
+    "AI96": "AI76",
+    "AI98": "AI76",
+    "AI98K5": "AI76",
+    "AI98PRIME": "AI76",
+    "G100": "AI76",
+    "DTZ": "AI76",
+    "DTZK4": "AI76",
+    "DTZPRIME": "AI76",
+    "DTLK4": "AI76",
+    "DTLPRIME": "AI76",
+    "DTAK2": "AI76",
+    "DTAK5": "AI76",
+    "DTEK2": "AI76",
+    "DTEK5": "AI76",
+    "DTM": "AI76",
+    "ZM40": "AI76",
+    "TS1": "AI76",
+    "PTB": "AI76",
+    "NPD": "AI76",
+    "UNKNOWN": "AI76",
+    "AI80": "AI76",
+    "AI93": "AI76",
+    "AI92K4": "AI76",
+    "AI92PRIME": "AI76",
+    "AI95K4": "AI76",
+    "AI95PREMIUM": "AI76",
+    "G95": "AI76",
+    "AI96K4": "AI76",
+    "AI98K4": "AI76",
+    "AI98SUPER": "AI76",
+    "AI100": "AI76",
+    "DT": "AI76",
+    "DTZK2": "AI76",
+    "DTZK5": "AI76",
+    "DTL": "AI76",
+    "DTLK5": "AI76",
+    "DTA": "AI76",
+    "DTAK4": "AI76",
+    "DTE": "AI76",
+    "DTEK4": "AI76",
+    "DTXP": "AI76",
+    "M100": "AI76",
+    "ZM100": "AI76",
+    "JETFUEL": "AI76",
+    "HYDRAZINE": "AI76",
+    "DISTILLYAT": "AI76",
+    "NEFRAS": "AI76"
+  }
+}
