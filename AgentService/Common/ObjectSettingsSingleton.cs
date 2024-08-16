@@ -117,11 +117,6 @@ namespace Service.Clients.Utils {
                 throw ex;
             }
         }
-
-        private bool validate()
-        {
-            return false;
-        }
     }
 
     public class ObjectSettings {

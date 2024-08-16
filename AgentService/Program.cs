@@ -6,6 +6,9 @@ using System.Text;
 using Service.LocalDb;
 using Service.Common;
 using Service.Clients.Utils;
+using System.Reflection;
+using System.Threading;
+using System;
 
 namespace AgentService {
     static class Program {
@@ -38,6 +41,20 @@ namespace AgentService {
 
             DatabaseManager.InitializeDatabase();
 
+            if (args != null && args.Length == 1 && args[0].Length > 1 && (args[0][0] == '-' || args[0][0] == '/')) {
+                switch (args[0].Substring(1).ToLower()) {
+                    default: RunService(); break;
+                    case "console":
+                    case "c":
+                        var servicesToRun = new ServiceBase[] {
+                            new Service(),
+                        };
+                        RunInteractive(servicesToRun);
+                        break;
+                };
+            } else {
+                RunService();
+            }
             RunService();
         }
 
@@ -48,6 +65,34 @@ namespace AgentService {
             };
             servicesToRun[0].CanHandlePowerEvent = true;
             ServiceBase.Run(servicesToRun);
+        }
+
+        private static void RunInteractive(ServiceBase[] servicesToRun)
+        {
+            var onStartMethod = typeof(ServiceBase).GetMethod("OnStart", BindingFlags.Instance | BindingFlags.NonPublic);
+            foreach (var service in servicesToRun) {
+                Console.Write("Запускается служба {0}...", service.ServiceName);
+
+                onStartMethod.Invoke(service, new object[] { new string[] { } });
+                Console.Write("Служба запущена и работает");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("Нажмите любую клавишу для завершения работы службы...");
+
+            Console.ReadKey();
+            Console.WriteLine();
+
+            var onStopMethod = typeof(ServiceBase).GetMethod("OnStop", BindingFlags.Instance | BindingFlags.NonPublic);
+            foreach (var service in servicesToRun) {
+                Console.Write("Останавливается служба {0}...", service.ServiceName);
+                onStopMethod.Invoke(service, null);
+                Console.WriteLine("Служба oстановлена");
+            }
+
+            Console.WriteLine("Все службы остановлены.");
+            // Keep the console alive for a second to allow the user to see the message.
+            Thread.Sleep(1000);
         }
     }
 }

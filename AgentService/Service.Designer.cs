@@ -1,5 +1,7 @@
 ﻿using Service.Clients.Utils;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace AgentService
 {
@@ -32,6 +34,12 @@ namespace AgentService
         private void InitializeComponent()
         {
             components = new System.ComponentModel.Container();
+
+            string executablePath = Assembly.GetExecutingAssembly().Location;
+            DirectoryInfo executableDirInfo = new DirectoryInfo(Path.GetDirectoryName(executablePath));
+            string serviceName = executableDirInfo.Name;
+
+            this.ServiceName = serviceName;
         }
 
         #endregion
