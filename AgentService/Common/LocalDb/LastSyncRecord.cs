@@ -57,7 +57,7 @@ namespace Service.LocalDb {
                             }
                             var row = new LastSyncRecord
                             {
-                                ExternalTankId = flowmeter.DeviceId,
+                                ExternalTankId = flowmeter.FlowmeterId,
                                 LastFlowmeterSyncDate = flowmeter.Measurements.Max(t => t.MeasurementDate).DateTime
                             };
                             row.UpdateFlowmeterMeasutementsInDb(logger);

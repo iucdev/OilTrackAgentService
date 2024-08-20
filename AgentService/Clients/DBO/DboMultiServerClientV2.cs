@@ -47,7 +47,7 @@ namespace Service.Clients.DBO {
                     }
                     if (source.FlowmeterIndicatorParams != null) {
                         flowmeterMeasurements.Add(
-                            new FlowmeterMeasurements() { DeviceId = source.ExternalId.Value, Measurements = GetAllFlowmeterFieldsAsync(source).Result }
+                            new FlowmeterMeasurements() { FlowmeterId = source.ExternalId.Value, Measurements = GetAllFlowmeterFieldsAsync(source).Result }
                         );
                     }
                 }

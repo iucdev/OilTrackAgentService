@@ -245,7 +245,7 @@ namespace Service.Clients.OPC {
             var flowmeterMeasurements = new List<FlowmeterMeasurements>();
 
             foreach (var source in ObjectSettings.Objects.First().ObjectSources.Where(s => s.FlowmeterIndicatorParams != null)) {
-                var flowmeterMeasurement = new FlowmeterMeasurements { DeviceId = source.ExternalId.Value };
+                var flowmeterMeasurement = new FlowmeterMeasurements { FlowmeterId = source.ExternalId.Value };
                 var measurement = new FlowmeterMeasurementData();
 
                 var flowmeterParams = source.FlowmeterIndicatorParams;

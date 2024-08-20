@@ -127,7 +127,7 @@ namespace Service.Clients.Utils {
                 var toSave = items
                     .Where(t => t.Measurements.Any())
                     .Select(item => {
-                        var lastSyncDate = LastSyncRecord.GetByExternalId(item.DeviceId, _logger).LastFlowmeterSyncDate;
+                        var lastSyncDate = LastSyncRecord.GetByExternalId(item.FlowmeterId, _logger).LastFlowmeterSyncDate;
                         var measurements = item.Measurements.Where(measurement => measurement.MeasurementDate.DateTime > lastSyncDate).ToList();
                         item.Measurements = measurements;
                         return item;
