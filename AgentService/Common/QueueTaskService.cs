@@ -66,6 +66,7 @@ namespace Service.Clients.Utils {
                         item.Transfers = transfers;
                         return item;
                     });
+                toSave = toSave.Where(t => t.Transfers.Any());
                 if (!toSave.Any()) {
                     _logger.Debug("QueueTaskService->SaveTransfersAsTask return null");
                     return;

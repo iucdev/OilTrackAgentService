@@ -18,7 +18,7 @@ namespace Sunp.Api.Client {
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SunpApiClient {
-        private string _baseUrl = "https://sunp-api.qoldau.kz";
+        private string _baseUrl = "";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
@@ -1040,161 +1040,239 @@ namespace Sunp.Api.Client {
         [System.Runtime.Serialization.EnumMember(Value = @"AI80")]
         AI80 = 1,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI91")]
-        AI91 = 2,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI80K2")]
+        AI80K2 = 2,
 
-        [System.Runtime.Serialization.EnumMember(Value = @"AI93")]
-        AI93 = 3,
+        [System.Runtime.Serialization.EnumMember(Value = @"AI80K3")]
+        AI80K3 = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI80K4")]
+        AI80K4 = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI80K5")]
+        AI80K5 = 5,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI91")]
+        AI91 = 6,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI91K2")]
+        AI91K2 = 7,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI91K3")]
+        AI91K3 = 8,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI91K4")]
+        AI91K4 = 9,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI91K5")]
+        AI91K5 = 10,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI92")]
-        AI92 = 4,
+        AI92 = 11,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI92K2")]
+        AI92K2 = 12,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI92K3")]
+        AI92K3 = 13,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI92K4")]
-        AI92K4 = 5,
+        AI92K4 = 14,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI92K5")]
-        AI92K5 = 6,
+        AI92K5 = 15,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI92PRIME")]
-        AI92PRIME = 7,
+        AI92PRIME = 16,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI93")]
+        AI93 = 17,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI93K2")]
+        AI93K2 = 18,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI93K3")]
+        AI93K3 = 19,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI93K4")]
+        AI93K4 = 20,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI93K5")]
+        AI93K5 = 21,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI95")]
-        AI95 = 8,
+        AI95 = 22,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI95K2")]
+        AI95K2 = 23,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI95K3")]
+        AI95K3 = 24,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI95K4")]
-        AI95K4 = 9,
+        AI95K4 = 25,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI95K5")]
-        AI95K5 = 10,
+        AI95K5 = 26,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI95PREMIUM")]
-        AI95PREMIUM = 11,
+        AI95PREMIUM = 27,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI95PRIME")]
-        AI95PRIME = 12,
+        AI95PRIME = 28,
 
         [System.Runtime.Serialization.EnumMember(Value = @"G95")]
-        G95 = 13,
+        G95 = 29,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI96")]
-        AI96 = 14,
+        AI96 = 30,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI96K2")]
+        AI96K2 = 31,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI96K3")]
+        AI96K3 = 32,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI96K4")]
-        AI96K4 = 15,
+        AI96K4 = 33,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI96K5")]
+        AI96K5 = 34,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI98")]
-        AI98 = 16,
+        AI98 = 35,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI98K2")]
+        AI98K2 = 36,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"AI98K3")]
+        AI98K3 = 37,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI98K4")]
-        AI98K4 = 17,
+        AI98K4 = 38,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI98K5")]
-        AI98K5 = 18,
+        AI98K5 = 39,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI98SUPER")]
-        AI98SUPER = 19,
+        AI98SUPER = 40,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI98PRIME")]
-        AI98PRIME = 20,
+        AI98PRIME = 41,
 
         [System.Runtime.Serialization.EnumMember(Value = @"AI100")]
-        AI100 = 21,
+        AI100 = 42,
 
         [System.Runtime.Serialization.EnumMember(Value = @"G100")]
-        G100 = 22,
+        G100 = 43,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DT")]
-        DT = 23,
+        DT = 44,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTZ")]
-        DTZ = 24,
+        DTZ = 45,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTZK2")]
-        DTZK2 = 25,
+        DTZK2 = 46,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTZK3")]
+        DTZK3 = 47,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTZK4")]
-        DTZK4 = 26,
+        DTZK4 = 48,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTZK5")]
-        DTZK5 = 27,
+        DTZK5 = 49,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTZPRIME")]
-        DTZPRIME = 28,
+        DTZPRIME = 50,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTL")]
-        DTL = 29,
+        DTL = 51,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTLK2")]
+        DTLK2 = 52,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTLK3")]
+        DTLK3 = 53,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTLK4")]
-        DTLK4 = 30,
+        DTLK4 = 54,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTLK5")]
-        DTLK5 = 31,
+        DTLK5 = 55,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTLPRIME")]
-        DTLPRIME = 32,
+        DTLPRIME = 56,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTA")]
-        DTA = 33,
+        DTA = 57,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTAK2")]
-        DTAK2 = 34,
+        DTAK2 = 58,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTAK3")]
+        DTAK3 = 59,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTAK4")]
-        DTAK4 = 35,
+        DTAK4 = 60,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTAK5")]
-        DTAK5 = 36,
+        DTAK5 = 61,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTE")]
-        DTE = 37,
+        DTE = 62,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTEK2")]
-        DTEK2 = 38,
+        DTEK2 = 63,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"DTEK3")]
+        DTEK3 = 64,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTEK4")]
-        DTEK4 = 39,
+        DTEK4 = 65,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTEK5")]
-        DTEK5 = 40,
+        DTEK5 = 66,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTXP")]
-        DTXP = 41,
+        DTXP = 67,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DTM")]
-        DTM = 42,
+        DTM = 68,
 
         [System.Runtime.Serialization.EnumMember(Value = @"M100")]
-        M100 = 43,
+        M100 = 69,
 
         [System.Runtime.Serialization.EnumMember(Value = @"ZM40")]
-        ZM40 = 44,
+        ZM40 = 70,
 
         [System.Runtime.Serialization.EnumMember(Value = @"ZM100")]
-        ZM100 = 45,
+        ZM100 = 71,
 
         [System.Runtime.Serialization.EnumMember(Value = @"TS1")]
-        TS1 = 46,
+        TS1 = 72,
 
         [System.Runtime.Serialization.EnumMember(Value = @"JETFUEL")]
-        JETFUEL = 47,
+        JETFUEL = 73,
 
         [System.Runtime.Serialization.EnumMember(Value = @"PTB")]
-        PTB = 48,
+        PTB = 74,
 
         [System.Runtime.Serialization.EnumMember(Value = @"HYDRAZINE")]
-        HYDRAZINE = 49,
+        HYDRAZINE = 75,
 
         [System.Runtime.Serialization.EnumMember(Value = @"NPD")]
-        NPD = 50,
+        NPD = 76,
 
         [System.Runtime.Serialization.EnumMember(Value = @"DISTILLYAT")]
-        DISTILLYAT = 51,
+        DISTILLYAT = 77,
 
         [System.Runtime.Serialization.EnumMember(Value = @"UNKNOWN")]
-        UNKNOWN = 52,
+        UNKNOWN = 78,
 
         [System.Runtime.Serialization.EnumMember(Value = @"NEFRAS")]
-        NEFRAS = 53,
+        NEFRAS = 79,
 
     }
 
@@ -1276,8 +1354,8 @@ namespace Sunp.Api.Client {
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class FlowmeterMeasurements {
-        [Newtonsoft.Json.JsonProperty("deviceId", Required = Newtonsoft.Json.Required.Always)]
-        public long DeviceId { get; set; }
+        [Newtonsoft.Json.JsonProperty("flowmeterId", Required = Newtonsoft.Json.Required.Always)]
+        public long FlowmeterId { get; set; }
 
         [Newtonsoft.Json.JsonProperty("measurements", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
@@ -1318,6 +1396,14 @@ namespace Sunp.Api.Client {
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public OilProductType? OilProductType { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("operationType", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        public FlowmeterOperationType OperationType { get; set; }
+
+        [Newtonsoft.Json.JsonProperty("sourceTankId", Required = Newtonsoft.Json.Required.Always)]
+        public long SourceTankId { get; set; }
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -1345,6 +1431,29 @@ namespace Sunp.Api.Client {
 
         [System.Runtime.Serialization.EnumMember(Value = @"CubicDecimeter")]
         CubicDecimeter = 2,
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
+    public enum FlowmeterOperationType {
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Undefined")]
+        Undefined = 0,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Filling")]
+        Filling = 1,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"RefundDefective")]
+        RefundDefective = 2,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Refund")]
+        Refund = 3,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"InternalDisplacement")]
+        InternalDisplacement = 4,
+
+        [System.Runtime.Serialization.EnumMember(Value = @"Incoming")]
+        Incoming = 5,
 
     }
 

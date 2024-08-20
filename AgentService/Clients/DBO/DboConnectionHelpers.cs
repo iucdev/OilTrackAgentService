@@ -173,7 +173,7 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         var parameter = new OracleParameter(":lastDateTime", OracleDbType.TimeStamp)
                         {
-                            Value = LastSyncRecord.Get(objectSource.InternalId, objectSource.ExternalId.Value, logger).LastTransfersSyncDate
+                            Value = LastSyncRecord.GetByExternalId(objectSource.ExternalId.Value, logger).LastTransfersSyncDate
                         };
                         command.Parameters.Add(parameter);
                         using (var reader = await command.ExecuteReaderAsync()) {
@@ -270,7 +270,7 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         var parameter = new OracleParameter(":lastDateTime", OracleDbType.TimeStamp)
                         {
-                            Value = LastSyncRecord.Get(objectSource.InternalId, objectSource.ExternalId.Value, logger).LastTransfersSyncDate
+                            Value = LastSyncRecord.GetByExternalId(objectSource.ExternalId.Value, logger).LastTransfersSyncDate
                         };
                         command.Parameters.Add(parameter);
                         using (var reader = await command.ExecuteReaderAsync()) {
@@ -367,7 +367,7 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         var parameter = new OracleParameter(":lastDateTime", OracleDbType.TimeStamp)
                         {
-                            Value = LastSyncRecord.Get(objectSource.InternalId, objectSource.ExternalId.Value, logger).LastTransfersSyncDate
+                            Value = LastSyncRecord.GetByExternalId(objectSource.ExternalId.Value, logger).LastTransfersSyncDate
                         };
                         command.Parameters.Add(parameter);
                         using (var reader = await command.ExecuteReaderAsync()) {
@@ -509,7 +509,7 @@ namespace Service.Clients.DBO {
                     {source.TankTransferParams.LevelFinish} is not null and
                     {source.TankTransferParams.VolumeStart} is not null and
                     {source.TankTransferParams.VolumeFinish} is not null";
-            var lastSyncDate = LastSyncRecord.Get(source.InternalId, source.ExternalId.Value, logger).LastTransfersSyncDate;
+            var lastSyncDate = LastSyncRecord.GetByExternalId(source.ExternalId.Value, logger).LastTransfersSyncDate;
             const int ps = 100;
 
             switch (dboType) {
@@ -531,7 +531,7 @@ namespace Service.Clients.DBO {
                     {source.TankMeasurementParams.DateTimeStamp}, 
                     {source.TankMeasurementParams.OilProductType}, 
                     {source.TankMeasurementParams.Density}";
-            var lastSyncDate = LastSyncRecord.Get(source.InternalId, source.ExternalId.Value, logger).LastMeasurementsSyncDate;
+            var lastSyncDate = LastSyncRecord.GetByExternalId(source.ExternalId.Value, logger).LastMeasurementsSyncDate;
             const int ps = 100;
 
             switch (dboType) {
@@ -553,7 +553,7 @@ namespace Service.Clients.DBO {
                     {source.FlowmeterIndicatorParams.CurrentTemperature},
                     {source.FlowmeterIndicatorParams.OilProductType},
                     {source.FlowmeterIndicatorParams.DateTimeStamp}";
-            var lastSyncDate = LastSyncRecord.Get(source.InternalId, source.ExternalId.Value, logger).LastFlowmeterSyncDate;
+            var lastSyncDate = LastSyncRecord.GetByExternalId(source.ExternalId.Value, logger).LastFlowmeterSyncDate;
             const int ps = 100;
 
             switch (dboType) {

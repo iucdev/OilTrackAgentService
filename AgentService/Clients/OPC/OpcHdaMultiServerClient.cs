@@ -111,7 +111,7 @@ namespace Service.Clients.OPC {
 
                 // для всех КПУ (расходомеров/уровнемеров)
                 foreach (var source in ObjectSettings.Objects.First().ObjectSources.Where(s => s.TankMeasurementParams != null)) {
-                    var lastSyncDate = LastSyncRecord.Get(source.InternalId, source.ExternalId.Value, Logger);
+                    var lastSyncDate = LastSyncRecord.GetByExternalId(source.ExternalId.Value, Logger);
                     // create tags
                     group = new Trend(_hdaServer);
 
