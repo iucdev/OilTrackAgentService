@@ -77,14 +77,13 @@ namespace Service.Clients.DBO {
 
             //logger.Debug(stringBuilder.ToString());
 
-            var temperature = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Temperature}")), 2));
-            var level = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Level}")), 2));
-            var volume = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Volume}")), 2));
-            var mass = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Mass}")), 2));
+            var temperature = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Temperature);
+            var level = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Level);
+            var volume = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Volume);
+            var mass = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Mass);
             var measurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankMeasurementParams.DateTimeStamp}"));
-            var density = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Density}")), 2));
-            var data = new TankMeasurementData
-            {
+            var density = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Density);
+            var data = new TankMeasurementData {
                 Temperature = temperature,
                 Level = level,
                 Volume = volume,
@@ -99,6 +98,24 @@ namespace Service.Clients.DBO {
             return data;
         }
 
+        private static decimal tryGetDecimalFromTbField(DbDataReader reader, string fieldName) {
+            int ordinal = reader.GetOrdinal(fieldName);
+
+            if (!reader.IsDBNull(ordinal)) {
+                var value = reader.GetValue(ordinal);
+
+                if (value is double doubleValue) {
+                    return Convert.ToDecimal(Math.Round(doubleValue, 2));
+                } else if (value is float floatValue) {
+                    return Convert.ToDecimal(Math.Round(floatValue, 2));
+                } else if (value is decimal decimalValue) {
+                    return Math.Round(decimalValue, 2);
+                }
+            }
+
+            return 0;
+        }
+
         private static FlowmeterMeasurementData ReadFlowmeterMeasurementFromDb(this DbDataReader reader, ObjectSource objectSource)
         {
             var data = new FlowmeterMeasurementData
@@ -111,6 +128,10 @@ namespace Service.Clients.DBO {
                 MeasurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.DateTimeStamp}")),
                 MassUnitType = objectSource.MassUnitType.Value,
                 OilProductType = CommonHelper.TryGetOilProductType(reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OilProductType}"))),
+                OperationType = Enum.TryParse<FlowmeterOperationType>(reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OilProductType}")), out var parsedOpType) 
+                    ? parsedOpType
+                    : FlowmeterOperationType.Undefined,
+                SourceTankId = CommonHelper.TryGetSourceTankId(reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.SourceTankId}")), objectSource),
                 VolumeUnitType = objectSource.VolumeUnitType.Value
             };
             return data;
@@ -552,7 +573,9 @@ namespace Service.Clients.DBO {
                     {source.FlowmeterIndicatorParams.CurrentDensity}, 
                     {source.FlowmeterIndicatorParams.CurrentTemperature},
                     {source.FlowmeterIndicatorParams.OilProductType},
-                    {source.FlowmeterIndicatorParams.DateTimeStamp}";
+                    {source.FlowmeterIndicatorParams.OperationType},
+                    {source.FlowmeterIndicatorParams.DateTimeStamp},
+                    {source.FlowmeterIndicatorParams.SourceTankId}";
             var lastSyncDate = LastSyncRecord.GetByExternalId(source.ExternalId.Value, logger).LastFlowmeterSyncDate;
             const int ps = 100;
 
@@ -569,7 +592,7 @@ namespace Service.Clients.DBO {
         {
             var lastSyncDateQuery = $"{source.MeasurementCondition} and {timeStampParam} > '{lastSyncDate.ToString("yyyy-MM-ddTHH:mm:ss.fff")}'";
             var query = $"SELECT TOP({ps}) {queryParams} FROM {tableName} {lastSyncDateQuery}";
-            //logger.Debug($"Query - {query}");
+            logger.Debug($"Query - {query}");
             return query;
         }
 
@@ -577,7 +600,7 @@ namespace Service.Clients.DBO {
         {
             var lastSyncDateQuery = $"{source.FlowmeterCondition} and {timeStampParam} > '{lastSyncDate.ToString("yyyy-MM-ddTHH:mm:ss.fff")}'";
             var query = $"SELECT TOP({ps}) {queryParams} FROM {tableName} {lastSyncDateQuery}";
-            //logger.Debug($"Query - {query}");
+            logger.Debug($"Query - {query}");
             return query;
         }
 
@@ -585,7 +608,7 @@ namespace Service.Clients.DBO {
         {
             var lastSyncDateQuery = $"{source.TransferCondition} and {timeStampParam} > '{lastSyncDate.ToString("yyyy-MM-ddTHH:mm:ss.fff")}'";
             var query = $"SELECT TOP({ps}) {queryParams} FROM {tableName} {lastSyncDateQuery} and {isNotNullParam}";
-            //logger.Debug($"Query - {query}");
+            logger.Debug($"Query - {query}");
             return query;
         }
 

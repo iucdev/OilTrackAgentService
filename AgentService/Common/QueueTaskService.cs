@@ -176,7 +176,7 @@ namespace Service.Clients.Utils {
                     task.Error = error;
                     task.UpdateInDb(_logger);
                 }
-                _logger.Debug($"QueueTaskService->AbandonTask success");
+                _logger.Debug($"QueueTaskService->AbandonTask success. Reason is: {error}");
             } catch (Exception ex) {
                 _logger.Error($"QueueTaskService->AbandonTask exception: {ex.Message + ex.StackTrace}");
                 throw ex;

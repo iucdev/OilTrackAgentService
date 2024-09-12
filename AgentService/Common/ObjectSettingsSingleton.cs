@@ -67,7 +67,7 @@ namespace Service.Clients.Utils {
                     throw new Exception(error);
                 }
 
-                if (ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => os.OilProductType == null))) {
+                if (ObjectSettings.ConnectionType != ConnectionType.Dbo && ObjectSettings.Objects.Any(o => o.ObjectSources.Any(os => os.OilProductType == null))) {
                     error = "ObjectSettings->Objects->OilProductType cannot be null";
                     _logger.Error(error);
                     throw new Exception(error);
@@ -203,6 +203,8 @@ namespace Service.Clients.Utils {
         public string CurrentTemperature { get; set; }
         public string DateTimeStamp { get; set; }
         public string OilProductType { get; set; }
+        public string OperationType { get; set; }
+        public string SourceTankId { get; set; }
     }
 
     public class TankMeasurementParams {

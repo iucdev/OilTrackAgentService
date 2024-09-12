@@ -85,14 +85,16 @@ namespace Service.LocalDb {
                         command.Parameters.AddWithValue("@ExternalTankId", externalTankId);
                         using (var reader = command.ExecuteReader()) {
                             if (reader.Read()) {
-                                logger.Debug($"LastSyncRecord->GetByExternalId success");
-                                return new LastSyncRecord
+                                var model = new LastSyncRecord
                                 {
-                                    InternalTankId = reader["InternalTankId"].ToString(),
+                                    InternalTankId = reader[nameof(InternalTankId)].ToString(),
                                     ExternalTankId = externalTankId,
-                                    LastMeasurementsSyncDate = DateTime.Parse(reader["LastMeasurementsSyncDate"].ToString()),
-                                    LastTransfersSyncDate = DateTime.Parse(reader["LastTransfersSyncDate"].ToString())
+                                    LastMeasurementsSyncDate = DateTime.Parse(reader[nameof(LastMeasurementsSyncDate)].ToString()),
+                                    LastTransfersSyncDate = DateTime.Parse(reader[nameof(LastTransfersSyncDate)].ToString()),
+                                    LastFlowmeterSyncDate = DateTime.Parse(reader[nameof(LastFlowmeterSyncDate)].ToString())
                                 };
+                                logger.Debug($"LastSyncRecord->GetByExternalId success {JsonConvert.SerializeObject(model)}");
+                                return model;
                             } else {
                                 var error = $"LastSyncRecord->GetByExternalId error: not found in db";
                                 logger.Error(error);
@@ -127,7 +129,7 @@ namespace Service.LocalDb {
                 }
 
                 if (count > 0) {
-                    logger.Debug($"LastSyncRecord->AddToDbIfNotExists success ({ExternalTankId})");
+                    logger.Debug($"LastSyncRecord->AddToDbIfNotExists success ({ExternalTankId} already exist in db)");
                     return;
                 }
 

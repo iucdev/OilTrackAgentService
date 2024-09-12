@@ -1,6 +1,7 @@
 ﻿using Service.Clients.Utils;
 using Sunp.Api.Client;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Service.Common {
     public static class CommonHelper {
@@ -11,6 +12,21 @@ namespace Service.Common {
             } else {
                 throw new System.Exception($"Не удалось найти вид нефтепродукта в маппинге для значения {rawVal}. Пожалуйста, добавьте это значение в маппинг в objectSettings.json");
             }
+        }
+
+        public static long TryGetSourceTankId(string rawVal, ObjectSource objectSource) {
+            var objectSettings = ObjectSettingsSingleton.Instance.ObjectSettings.Objects.FirstOrDefault(e => e.ObjectSources.Any(s => s.InternalId == objectSource.InternalId && s.ExternalId == objectSource.ExternalId));
+            
+            if (objectSettings is null) {
+                return 0;
+            }
+
+            var tankId = objectSettings.ObjectSources.FirstOrDefault(t => t.InternalId == rawVal)?.ExternalId;
+            if (tankId is null) {
+                return 0;
+            }
+
+            return tankId.Value;
         }
 
         public static TankMeasurementData[] SetEnums(this TankMeasurementData[] items, ObjectSource source, OilProductType? oilProductType = null) {
