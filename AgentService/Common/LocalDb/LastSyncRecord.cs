@@ -24,7 +24,8 @@ namespace Service.LocalDb {
                     case QueueTaskType.SendTankMeasurements:
                         var items = JsonConvert.DeserializeObject<TankMeasurements[]>(task.Items);
                         foreach (var tankMeasurements in items) {
-                            if (tankMeasurements.Measurements.Any()) {
+                            if (!tankMeasurements.Measurements.Any()) {
+                                logger.Debug($"LastSyncRecord->Update->TankMeasurements->Skip item where ExternalTankId = {tankMeasurements.TankId}");
                                 continue;
                             }
                             var row = new LastSyncRecord
@@ -38,7 +39,8 @@ namespace Service.LocalDb {
                     case QueueTaskType.SendTankTransfer:
                         var tanksTransfers = JsonConvert.DeserializeObject<TankTransfers[]>(task.Items);
                         foreach (var tankTransfers in tanksTransfers) {
-                            if (tankTransfers.Transfers.Any()) {
+                            if (!tankTransfers.Transfers.Any()) {
+                                logger.Debug($"LastSyncRecord->Update->TankTransfers->Skip item where ExternalTankId = {tankTransfers.TankId}");
                                 continue;
                             }
                             var row = new LastSyncRecord
@@ -52,7 +54,8 @@ namespace Service.LocalDb {
                     case QueueTaskType.SendFlowmeterMeasurements:
                         var flowmeterItems = JsonConvert.DeserializeObject<FlowmeterMeasurements[]>(task.Items);
                         foreach (var flowmeter in flowmeterItems) {
-                            if (flowmeter.Measurements.Any()) {
+                            if (!flowmeter.Measurements.Any()) {
+                                logger.Debug($"LastSyncRecord->Update->FlowmeterMeasurements->Skip item where ExternalTankId = {flowmeter.FlowmeterId}");
                                 continue;
                             }
                             var row = new LastSyncRecord
@@ -179,6 +182,7 @@ namespace Service.LocalDb {
                 using (var command = new SQLiteCommand(updateQuery, connection)) {
                     command.Parameters.AddWithValue($"@{nameof(ExternalTankId)}", ExternalTankId);
                     command.Parameters.AddWithValue($"@{nameof(LastMeasurementsSyncDate)}", LastMeasurementsSyncDate.ToDbString());
+                    logger.Debug($"Executing UpdateTankMeasurementsInDb: {command.CommandText}. Parameters: ExternalTankId={ExternalTankId}, LastMeasurementsSyncDate={LastMeasurementsSyncDate.ToDbString()}");
                     command.ExecuteNonQuery();
                 }
             }
@@ -195,6 +199,7 @@ namespace Service.LocalDb {
                 using (var command = new SQLiteCommand(updateQuery, connection)) {
                     command.Parameters.AddWithValue($"@{nameof(ExternalTankId)}", ExternalTankId);
                     command.Parameters.AddWithValue($"@{nameof(LastTransfersSyncDate)}", LastTransfersSyncDate.ToDbString());
+                    logger.Debug($"Executing UpdateTankTransfersInDb: {command.CommandText}. Parameters: ExternalTankId={ExternalTankId}, LastTransfersSyncDate={LastTransfersSyncDate.ToDbString()}");
                     command.ExecuteNonQuery();
                 }
             }
@@ -211,6 +216,7 @@ namespace Service.LocalDb {
                 using (var command = new SQLiteCommand(updateQuery, connection)) {
                     command.Parameters.AddWithValue($"@{nameof(ExternalTankId)}", ExternalTankId);
                     command.Parameters.AddWithValue($"@{nameof(LastFlowmeterSyncDate)}", LastFlowmeterSyncDate.ToDbString());
+                    logger.Debug($"Executing UpdateFlowmeterMeasutementsInDb: {command.CommandText}. Parameters: ExternalTankId={ExternalTankId}, LastFlowmeterSyncDate={LastFlowmeterSyncDate.ToDbString()}");
                     command.ExecuteNonQuery();
                 }
             }
