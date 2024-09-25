@@ -495,80 +495,6 @@ namespace Sunp.Api.Client {
         }
 
         /// <summary>
-        /// Отправка инцидентов с агента
-        /// </summary>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ResponseBodyBase> IncidentSendIncidentAsync(SendIncidentRequestBody requestBody)
-        {
-            return IncidentSendIncidentAsync(requestBody, System.Threading.CancellationToken.None);
-        }
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <summary>
-        /// Отправка инцидентов с агента
-        /// </summary>
-        /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ResponseBodyBase> IncidentSendIncidentAsync(SendIncidentRequestBody requestBody, System.Threading.CancellationToken cancellationToken)
-        {
-            if (requestBody == null)
-                throw new System.ArgumentNullException("requestBody");
-
-            var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/Incident/SendIncident");
-
-            var client_ = _httpClient;
-            var disposeClient_ = false;
-            try {
-                using (var request_ = new System.Net.Http.HttpRequestMessage()) {
-                    var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(requestBody, _settings.Value));
-                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
-                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
-
-                    PrepareRequest(client_, request_, urlBuilder_);
-
-                    var url_ = urlBuilder_.ToString();
-                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
-
-                    PrepareRequest(client_, request_, url_);
-
-                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
-                    var disposeResponse_ = true;
-                    try {
-                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
-                        if (response_.Content != null && response_.Content.Headers != null) {
-                            foreach (var item_ in response_.Content.Headers)
-                                headers_[item_.Key] = item_.Value;
-                        }
-
-                        ProcessResponse(client_, response_);
-
-                        var status_ = (int)response_.StatusCode;
-                        if (status_ == 200) {
-                            var objectResponse_ = await ReadObjectResponseAsync<ResponseBodyBase>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null) {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            return objectResponse_.Object;
-                        } else {
-                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
-                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
-                        }
-                    }
-                    finally {
-                        if (disposeResponse_)
-                            response_.Dispose();
-                    }
-                }
-            }
-            finally {
-                if (disposeClient_)
-                    client_.Dispose();
-            }
-        }
-
-        /// <summary>
         /// Получение данных по заявителю
         /// </summary>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -1357,6 +1283,9 @@ namespace Sunp.Api.Client {
         [Newtonsoft.Json.JsonProperty("flowmeterId", Required = Newtonsoft.Json.Required.Always)]
         public long FlowmeterId { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("deviceId", Required = Newtonsoft.Json.Required.Always)]
+        public long DeviceId { get; set; }
+
         [Newtonsoft.Json.JsonProperty("measurements", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public System.Collections.Generic.ICollection<FlowmeterMeasurementData> Measurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterMeasurementData>();
@@ -1463,55 +1392,6 @@ namespace Sunp.Api.Client {
         [System.ComponentModel.DataAnnotations.Required]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"\b[A-Fa-f0-9]{8}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{4}-[A-Fa-f0-9]{12}\b")]
         public string PackageId { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class SendIncidentRequestBody : PackageRequestBody {
-        [Newtonsoft.Json.JsonProperty("date", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public System.DateTimeOffset Date { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("incidentKind", Required = Newtonsoft.Json.Required.Always)]
-        public IncidentKind IncidentKind { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("description", Required = Newtonsoft.Json.Required.Always)]
-        [System.ComponentModel.DataAnnotations.Required]
-        public string Description { get; set; }
-
-        [Newtonsoft.Json.JsonProperty("objectId", Required = Newtonsoft.Json.Required.Always)]
-        public long ObjectId { get; set; }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
-    public enum IncidentKind {
-
-        UnDefind = 0,
-
-        DeviceConnectionLoose = 1,
-
-        DeviceNoData = 2,
-
-        IncorrectValue = 3,
-
-        IncorrectTag = 4,
-
-        LowAvailableFreeSpaceOnDrive = 5,
-
-        SqlQueryError = 6,
-
-        AgentConnectionLoose = 7,
-
-        ServiceStatusChange = 8,
-
-        WrongWeight = 9,
-
-        WrongVolume = 10,
-
-        WrongDensity = 11,
-
-        WrongOilType = 12,
 
     }
 
