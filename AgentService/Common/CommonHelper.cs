@@ -1,16 +1,18 @@
-﻿using Service.Clients.Utils;
+﻿using NLog;
+using Service.Clients.Utils;
 using Sunp.Api.Client;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Service.Common {
     public static class CommonHelper {
-        public static OilProductType TryGetOilProductType(string rawVal) {
+        public static OilProductType TryGetOilProductType(string rawVal, Logger logger) {
             var oilProductMapping = ObjectSettingsSingleton.Instance.ObjectSettings.OilProductTypeMapping;
             if (oilProductMapping.ContainsKey(rawVal)) {
                 return oilProductMapping[rawVal];
             } else {
-                throw new System.Exception($"Не удалось найти вид нефтепродукта в маппинге для значения {rawVal}. Пожалуйста, добавьте это значение в маппинг в objectSettings.json");
+                logger.Error($"Не удалось найти вид нефтепродукта в маппинге для значения {rawVal}. Пожалуйста, добавьте это значение в маппинг в objectSettings.json");
+                return OilProductType.UNKNOWN;
             }
         }
 

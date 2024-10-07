@@ -89,15 +89,6 @@ namespace Service.Clients.OPC {
             return decimal.Parse(result, CultureInfo.InvariantCulture);
         }
 
-        public static decimal TryGetDecimal(ItemValueCollection[] itemValueResults, string searchedItemName, Logger logger) {
-            var result = ToSafeString(OpcHelpers.GetValueByName(itemValueResults, searchedItemName, logger)).Replace(',', '.');
-            if (string.IsNullOrEmpty(result)) {
-                logger.Error("Param {0} Result is null or Empty", searchedItemName, result);
-                throw new InvalidOperationException();
-            }
-            return decimal.Parse(result, CultureInfo.InvariantCulture);
-        }
-
         public static DateTime TryGetDateTime(ItemValueResult[] itemValueResults, string searchedItemName, Logger logger) {
             var result = OpcHelpers.GetValueByName(itemValueResults, searchedItemName, logger);
             DateTime dateStamp;
@@ -123,8 +114,22 @@ namespace Service.Clients.OPC {
                 throw new InvalidOperationException();
             }
             var rawVal = ToSafeString(result);
-            var oilProductType = CommonHelper.TryGetOilProductType(rawVal);
+            var oilProductType = CommonHelper.TryGetOilProductType(rawVal, logger);
             return oilProductType;
+        }
+
+        public static FlowmeterOperationType TryGetFlowmeterOperationType(ItemValueResult[] itemValueResults, string searchedItemName, Logger logger)
+        {
+            var result = OpcHelpers.GetValueByName(itemValueResults, searchedItemName, logger).Value;
+            if (string.IsNullOrEmpty(ToSafeString(result))) {
+                logger.Error("Param {0} Result is null or Empty", searchedItemName, result);
+                throw new InvalidOperationException();
+            }
+            var rawVal = ToSafeString(result);
+            if (!Enum.TryParse<FlowmeterOperationType>(rawVal, out var opType)) {
+                logger.Error($"Exception found. Unexpected operation type: {rawVal}.");
+            }
+            return opType;
         }
     }
 }

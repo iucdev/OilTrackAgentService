@@ -113,7 +113,7 @@ namespace Service.Clients.OPC {
                     tableBuilder.AppendLine($"Weight: {source.TankMeasurementParams.Mass}");
                     tableBuilder.AppendLine($"Level: {source.TankMeasurementParams.Level}");
                     tableBuilder.AppendLine($"DateTimeStamp: {source.TankMeasurementParams.DateTimeStamp}");
-                    tableBuilder.AppendLine($"ProductName: {source.OilProductType.Value}");
+                    tableBuilder.AppendLine($"OilProductType: {source.TankMeasurementParams.OilProductType}");
                     tableBuilder.AppendLine("------------------------------");
 
                     Logger.Debug(tableBuilder.ToString());
@@ -124,7 +124,7 @@ namespace Service.Clients.OPC {
                     items.AddIfNotNull(source.TankMeasurementParams.Mass);
                     items.AddIfNotNull(source.TankMeasurementParams.Level);
                     items.AddIfNotNull(source.TankMeasurementParams.DateTimeStamp);
-                    items.AddIfNotNull(source.OilProductType.Value.ToString());
+                    items.AddIfNotNull(source.TankMeasurementParams.OilProductType);
 
                     var itemArray = items.ToArray();
                     itemArray = _tankMeasurementGroupRead.AddItems(itemArray);
@@ -149,7 +149,7 @@ namespace Service.Clients.OPC {
                     tableBuilder.AppendLine($"VolumeStart: {source.TankTransferParams.VolumeStart}");
                     tableBuilder.AppendLine($"VolumeStart: {source.TankTransferParams.VolumeStart}");
                     tableBuilder.AppendLine($"VolumeFinish: {source.TankTransferParams.VolumeFinish}");
-                    tableBuilder.AppendLine($"OilProductName: {source.OilProductType.Value}");
+                    tableBuilder.AppendLine($"OilProductName: {source.TankTransferParams.OilProductType}");
                     tableBuilder.AppendLine("------------------------------");
 
                     items.AddIfNotNull(source.TankTransferParams.StartTime);
@@ -160,7 +160,7 @@ namespace Service.Clients.OPC {
                     items.AddIfNotNull(source.TankTransferParams.LevelFinish);
                     items.AddIfNotNull(source.TankTransferParams.VolumeStart);
                     items.AddIfNotNull(source.TankTransferParams.VolumeFinish);
-                    items.AddIfNotNull(source.OilProductType.Value.ToString());
+                    items.AddIfNotNull(source.TankTransferParams.OilProductType);
 
                     var itemArray = items.ToArray();
                     itemArray = _transferGroupReport.AddItems(itemArray);
@@ -181,7 +181,9 @@ namespace Service.Clients.OPC {
                     tableBuilder.AppendLine($"CurrentDensity: {source.FlowmeterIndicatorParams.CurrentDensity}");
                     tableBuilder.AppendLine($"CurrentTemperature: {source.FlowmeterIndicatorParams.CurrentTemperature}");
 
-                    tableBuilder.AppendLine($"OilProductName: {source.OilProductType.Value}");
+                    tableBuilder.AppendLine($"OilProductName: {source.FlowmeterIndicatorParams.OilProductType}");
+                    tableBuilder.AppendLine($"OperationType: {source.FlowmeterIndicatorParams.OperationType}");
+                    tableBuilder.AppendLine($"SourceTankId: {source.FlowmeterIndicatorParams.SourceTankId}");
                     tableBuilder.AppendLine("------------------------------");
 
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.TotalMass);
@@ -189,6 +191,9 @@ namespace Service.Clients.OPC {
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.TotalVolume);
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.CurrentDensity);
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.CurrentTemperature);
+                    items.AddIfNotNull(source.FlowmeterIndicatorParams.OilProductType);
+                    items.AddIfNotNull(source.FlowmeterIndicatorParams.OperationType);
+                    items.AddIfNotNull(source.FlowmeterIndicatorParams.SourceTankId);
 
                     var itemArray = items.ToArray();
                     itemArray = _flowmeterGroupReport.AddItems(itemArray);
@@ -245,38 +250,43 @@ namespace Service.Clients.OPC {
             var flowmeterMeasurements = new List<FlowmeterMeasurements>();
 
             foreach (var source in ObjectSettings.Objects.First().ObjectSources.Where(s => s.FlowmeterIndicatorParams != null)) {
-                var flowmeterMeasurement = new FlowmeterMeasurements { FlowmeterId = source.ExternalId.Value };
-                var measurement = new FlowmeterMeasurementData();
+                try {
+                    var flowmeterMeasurement = new FlowmeterMeasurements { FlowmeterId = source.ExternalId.Value };
+                    var measurement = new FlowmeterMeasurementData();
 
-                var flowmeterParams = source.FlowmeterIndicatorParams;
+                    var flowmeterParams = source.FlowmeterIndicatorParams;
 
-                measurement.MeasurementDate = DateTime.Now;
-                measurement.TotalMass = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.TotalMass, Logger);
-                measurement.FlowMass = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.FlowMass, Logger);
-                measurement.TotalVolume = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.TotalVolume, Logger);
-                measurement.CurrentDensity = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.CurrentDensity, Logger);
-                measurement.CurrentTemperature = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.CurrentTemperature, Logger);
+                    measurement.MeasurementDate = DateTime.Now;
+                    measurement.TotalMass = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.TotalMass, Logger);
+                    measurement.FlowMass = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.FlowMass, Logger);
+                    measurement.TotalVolume = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.TotalVolume, Logger);
+                    measurement.CurrentDensity = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.CurrentDensity, Logger);
+                    measurement.CurrentTemperature = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.CurrentTemperature, Logger);
 
-                flowmeterMeasurement.Measurements = new[] { measurement }.SetEnums(source, OpcHelpers.TryGetOilProductType(flowmeterMeasurementResults, flowmeterParams.OilProductType, Logger));
-                Logger.Debug("FlowmeterMeasurements Model Filled with values");
+                    flowmeterMeasurement.Measurements = new[] { measurement }.SetEnums(source, OpcHelpers.TryGetOilProductType(flowmeterMeasurementResults, flowmeterParams.OilProductType, Logger));
+                    Logger.Debug("FlowmeterMeasurements Model Filled with values");
 
-                var tableBuilder = new StringBuilder();
-                tableBuilder.AppendLine("FlowmeterIndicators Values:");
-                tableBuilder.AppendLine("------------------------------");
-                tableBuilder.AppendLine($"TotalMass: {measurement.TotalMass}");
-                tableBuilder.AppendLine($"FlowMass: {measurement.FlowMass}");
-                tableBuilder.AppendLine($"TotalVolume: {measurement.TotalVolume}");
-                tableBuilder.AppendLine($"CurrentDensity: {measurement.CurrentDensity}");
-                tableBuilder.AppendLine($"CurrentTemperature: {measurement.CurrentTemperature}");
-                tableBuilder.AppendLine($"OilProductType: {measurement.OilProductType}");
+                    var tableBuilder = new StringBuilder();
+                    tableBuilder.AppendLine("FlowmeterIndicators Values:");
+                    tableBuilder.AppendLine("------------------------------");
+                    tableBuilder.AppendLine($"TotalMass: {measurement.TotalMass}");
+                    tableBuilder.AppendLine($"FlowMass: {measurement.FlowMass}");
+                    tableBuilder.AppendLine($"TotalVolume: {measurement.TotalVolume}");
+                    tableBuilder.AppendLine($"CurrentDensity: {measurement.CurrentDensity}");
+                    tableBuilder.AppendLine($"CurrentTemperature: {measurement.CurrentTemperature}");
+                    tableBuilder.AppendLine($"OilProductType: {measurement.OilProductType}");
 
-                var itemsStr = string.Format("Source '{0}'", source.ExternalId.Value);
+                    var itemsStr = string.Format("Source '{0}'", source.ExternalId.Value);
 
-                Logger.Debug(itemsStr);
-                Logger.Debug(tableBuilder.ToString());
-                flowmeterMeasurements.Add(flowmeterMeasurement);
-                Logger.Debug("Keep Filling List");
-                Logger.Debug("------------------------------");
+                    Logger.Debug(itemsStr);
+                    Logger.Debug(tableBuilder.ToString());
+                    flowmeterMeasurements.Add(flowmeterMeasurement);
+                    Logger.Debug("Keep Filling List");
+                    Logger.Debug("------------------------------");
+                } catch (Exception ex) {
+                    Logger.Error($"Error while collecting flowmeter measurements {source.InternalId}. Exception: {ex.Message + ex.StackTrace}");
+                    continue;
+                }
             }
             Logger.Debug("FlowmeterMeasurements List Filled");
 
@@ -288,45 +298,49 @@ namespace Service.Clients.OPC {
             var tanksMeasurements = new List<TankMeasurements>();
 
             foreach (var source in ObjectSettings.Objects.First().ObjectSources.Where(s => s.TankMeasurementParams != null)) {
-                var tankMeasurements = new TankMeasurements { TankId = source.ExternalId.Value };
-                var measurement = new TankMeasurementData();
+                try {
+                    var tankMeasurements = new TankMeasurements { TankId = source.ExternalId.Value };
+                    var measurement = new TankMeasurementData();
 
-                var tankParams = source.TankMeasurementParams;
-                DateTime utcNow = DateTime.UtcNow;
-                // Define the time span for UTC+5
-                TimeSpan utcPlusFive = new TimeSpan(5, 0, 0);
-                // Add the time span to the UTC time
-                DateTime utcPlusFiveTime = utcNow.Add(utcPlusFive);
-                var now = new DateTime(utcPlusFiveTime.Year, utcPlusFiveTime.Month, utcPlusFiveTime.Day, utcPlusFiveTime.Hour, utcPlusFiveTime.Minute, utcPlusFiveTime.Second, utcPlusFiveTime.Millisecond);
-                measurement.Temperature = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Temperature, Logger);
-                measurement.Density = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Density, Logger);
-                measurement.Volume = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Volume, Logger);
-                measurement.Mass = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Mass, Logger);
-                measurement.Level = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Level, Logger);
-                measurement.MeasurementDate = string.IsNullOrEmpty(tankParams.DateTimeStamp) ? now : OpcHelpers.TryGetDateTime(tankMeasurementResults, tankParams.DateTimeStamp, Logger);
+                    var tankParams = source.TankMeasurementParams;
+                    DateTime utcNow = DateTime.UtcNow;
+                    // Define the time span for UTC+5
+                    TimeSpan utcPlusFive = new TimeSpan(5, 0, 0);
+                    // Add the time span to the UTC time
+                    DateTime utcPlusFiveTime = utcNow.Add(utcPlusFive);
+                    var now = new DateTime(utcPlusFiveTime.Year, utcPlusFiveTime.Month, utcPlusFiveTime.Day, utcPlusFiveTime.Hour, utcPlusFiveTime.Minute, utcPlusFiveTime.Second, utcPlusFiveTime.Millisecond);
+                    measurement.Temperature = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Temperature, Logger);
+                    measurement.Density = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Density, Logger);
+                    measurement.Volume = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Volume, Logger);
+                    measurement.Mass = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Mass, Logger);
+                    measurement.Level = OpcHelpers.TryGetDecimal(tankMeasurementResults, tankParams.Level, Logger);
+                    measurement.MeasurementDate = string.IsNullOrEmpty(tankParams.DateTimeStamp) ? now : OpcHelpers.TryGetDateTime(tankMeasurementResults, tankParams.DateTimeStamp, Logger);
 
-                tankMeasurements.Measurements = new[] { measurement }.SetEnums(source, OpcHelpers.TryGetOilProductType(tankMeasurementResults, tankParams.OilProductType, Logger));
-                Logger.Debug("Tank Measurement Model Filled with values");
+                    tankMeasurements.Measurements = new[] { measurement }.SetEnums(source, OpcHelpers.TryGetOilProductType(tankMeasurementResults, tankParams.OilProductType, Logger));
+                    Logger.Debug("Tank Measurement Model Filled with values");
 
-                var tableBuilder = new StringBuilder();
-                tableBuilder.AppendLine("Measurement Values:");
-                tableBuilder.AppendLine("------------------------------");
-                tableBuilder.AppendLine($"Temperature: {measurement.Temperature}");
-                tableBuilder.AppendLine($"Density: {measurement.Density}");
-                tableBuilder.AppendLine($"Volume: {measurement.Volume}");
-                tableBuilder.AppendLine($"Mass: {measurement.Mass}");
-                tableBuilder.AppendLine($"Level: {measurement.Level}");
-                tableBuilder.AppendLine($"MeasurementDate: {measurement.MeasurementDate}");
-                tableBuilder.AppendLine($"OilProductType: {measurement.OilProductType}");
+                    var tableBuilder = new StringBuilder();
+                    tableBuilder.AppendLine("Measurement Values:");
+                    tableBuilder.AppendLine("------------------------------");
+                    tableBuilder.AppendLine($"Temperature: {measurement.Temperature}");
+                    tableBuilder.AppendLine($"Density: {measurement.Density}");
+                    tableBuilder.AppendLine($"Volume: {measurement.Volume}");
+                    tableBuilder.AppendLine($"Mass: {measurement.Mass}");
+                    tableBuilder.AppendLine($"Level: {measurement.Level}");
+                    tableBuilder.AppendLine($"MeasurementDate: {measurement.MeasurementDate}");
+                    tableBuilder.AppendLine($"OilProductType: {measurement.OilProductType}");
 
-                var itemsStr = string.Format("Source '{0}'", source.ExternalId.Value);
+                    var itemsStr = string.Format("Source '{0}'", source.ExternalId.Value);
 
-                Logger.Debug(itemsStr);
-                Logger.Debug(tableBuilder.ToString());
-                tanksMeasurements.Add(tankMeasurements);
-                Logger.Debug("Keep Filling List");
-                Logger.Debug("------------------------------");
-
+                    Logger.Debug(itemsStr);
+                    Logger.Debug(tableBuilder.ToString());
+                    tanksMeasurements.Add(tankMeasurements);
+                    Logger.Debug("Keep Filling List");
+                    Logger.Debug("------------------------------");
+                } catch (Exception ex) {
+                    Logger.Error($"Error while collecting tank measurements {source.InternalId}. Exception: {ex.Message}");
+                    continue;
+                }
             }
             Logger.Debug("TankMeasurement List Filled");
 
@@ -338,48 +352,52 @@ namespace Service.Clients.OPC {
             var tanksTransfers = new List<TankTransfers>();
 
             foreach (var source in ObjectSettings.Objects.First().ObjectSources.Where(s => s.TankTransferParams != null)) {
-                var tankTransfers = new TankTransfers { TankId = source.ExternalId.Value, Transfers = new List<TankTransferData>() };
-                var transfer = new TankTransferData();
+                try {
+                    var tankTransfers = new TankTransfers { TankId = source.ExternalId.Value, Transfers = new List<TankTransferData>() };
+                    var transfer = new TankTransferData();
 
-                var transferParams = source.TankTransferParams;
+                    var transferParams = source.TankTransferParams;
 
-                Logger.Debug("Start Filling Decimals into Model");
-                transfer.VolumeStart = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.VolumeStart, Logger);
-                transfer.VolumeEnd = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.VolumeFinish, Logger);
-                transfer.MassStart = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.MassStart, Logger);
-                transfer.MassEnd = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.MassFinish, Logger);
-                transfer.LevelStart = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.LevelStart, Logger);
-                transfer.LevelEnd = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.LevelFinish, Logger);
-                Logger.Debug("Finish Filling Decimals into Model");
-                Logger.Debug("Start Filling Dates into Model");
-                transfer.StartDate = OpcHelpers.TryGetDateTime(tankTransferResult, transferParams.StartTime, Logger);
-                transfer.EndDate = OpcHelpers.TryGetDateTime(tankTransferResult, transferParams.EndTime, Logger);
-                Logger.Debug("Finish Filling Dates into Model");
-                if (transfer.StartDate.DateTime <= DateTime.MinValue || transfer.EndDate.DateTime <= DateTime.MinValue) {
-                    throw new Exception($"StartDate {transfer.StartDate}, EndDate {transfer.EndDate}. Date error");
+                    Logger.Debug("Start Filling Decimals into Model");
+                    transfer.VolumeStart = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.VolumeStart, Logger);
+                    transfer.VolumeEnd = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.VolumeFinish, Logger);
+                    transfer.MassStart = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.MassStart, Logger);
+                    transfer.MassEnd = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.MassFinish, Logger);
+                    transfer.LevelStart = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.LevelStart, Logger);
+                    transfer.LevelEnd = OpcHelpers.TryGetDecimal(tankTransferResult, transferParams.LevelFinish, Logger);
+                    Logger.Debug("Finish Filling Decimals into Model");
+                    Logger.Debug("Start Filling Dates into Model");
+                    transfer.StartDate = OpcHelpers.TryGetDateTime(tankTransferResult, transferParams.StartTime, Logger);
+                    transfer.EndDate = OpcHelpers.TryGetDateTime(tankTransferResult, transferParams.EndTime, Logger);
+                    Logger.Debug("Finish Filling Dates into Model");
+                    if (transfer.StartDate.DateTime <= DateTime.MinValue || transfer.EndDate.DateTime <= DateTime.MinValue) {
+                        throw new Exception($"StartDate {transfer.StartDate}, EndDate {transfer.EndDate}. Date error");
+                    }
+
+                    tankTransfers.Transfers = new[] { transfer }.SetEnums(source, OpcHelpers.TryGetOilProductType(tankTransferResult, transferParams.OilProductType, Logger));
+                    Logger.Debug("Transfer Measurement Model Filled with values");
+
+                    var tableBuilder = new StringBuilder();
+                    tableBuilder.AppendLine("Transfer Measurement Values:");
+                    tableBuilder.AppendLine("------------------------------");
+                    tableBuilder.AppendLine($"VolumeStart: {transfer.VolumeStart}");
+                    tableBuilder.AppendLine($"VolumeFinish: {transfer.VolumeEnd}");
+                    tableBuilder.AppendLine($"MassStart: {transfer.MassStart}");
+                    tableBuilder.AppendLine($"MassFinish: {transfer.MassEnd}");
+                    tableBuilder.AppendLine($"LevelStart: {transfer.LevelStart}");
+                    tableBuilder.AppendLine($"LevelFinish: {transfer.LevelEnd}");
+                    tableBuilder.AppendLine($"StartDate: {transfer.StartDate}");
+                    tableBuilder.AppendLine($"EndDate: {transfer.EndDate}");
+                    tableBuilder.AppendLine($"OilProductType: {transfer.OilProductType}");
+
+                    Logger.Debug(tableBuilder.ToString());
+                    tanksTransfers.Add(tankTransfers);
+                    Logger.Debug("Keep Filling List");
+                    Logger.Debug("------------------------------");
+                } catch (Exception ex) {
+                    Logger.Error($"Error while collecting tank tranfsers {source.InternalId}. Exception: {ex.Message}");
+                    continue;
                 }
-
-                tankTransfers.Transfers = new[] { transfer }.SetEnums(source, OpcHelpers.TryGetOilProductType(tankTransferResult, transferParams.OilProductType, Logger));
-                Logger.Debug("Transfer Measurement Model Filled with values");
-
-                var tableBuilder = new StringBuilder();
-                tableBuilder.AppendLine("Transfer Measurement Values:");
-                tableBuilder.AppendLine("------------------------------");
-                tableBuilder.AppendLine($"VolumeStart: {transfer.VolumeStart}");
-                tableBuilder.AppendLine($"VolumeFinish: {transfer.VolumeEnd}");
-                tableBuilder.AppendLine($"MassStart: {transfer.MassStart}");
-                tableBuilder.AppendLine($"MassFinish: {transfer.MassEnd}");
-                tableBuilder.AppendLine($"LevelStart: {transfer.LevelStart}");
-                tableBuilder.AppendLine($"LevelFinish: {transfer.LevelEnd}");
-                tableBuilder.AppendLine($"StartDate: {transfer.StartDate}");
-                tableBuilder.AppendLine($"EndDate: {transfer.EndDate}");
-                tableBuilder.AppendLine($"OilProductType: {transfer.OilProductType}");
-
-                Logger.Debug(tableBuilder.ToString());
-                tanksTransfers.Add(tankTransfers);
-                Logger.Debug("Keep Filling List");
-                Logger.Debug("------------------------------");
-
             }
             return tanksTransfers.ToArray();
         }

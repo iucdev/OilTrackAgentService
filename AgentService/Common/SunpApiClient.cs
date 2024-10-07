@@ -18,7 +18,7 @@ namespace Sunp.Api.Client {
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class SunpApiClient {
-        private string _baseUrl = "";
+        private string _baseUrl = "https://demo-sunp-api.qoldau.kz";
         private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
@@ -1283,9 +1283,6 @@ namespace Sunp.Api.Client {
         [Newtonsoft.Json.JsonProperty("flowmeterId", Required = Newtonsoft.Json.Required.Always)]
         public long FlowmeterId { get; set; }
 
-        [Newtonsoft.Json.JsonProperty("deviceId", Required = Newtonsoft.Json.Required.Always)]
-        public long DeviceId { get; set; }
-
         [Newtonsoft.Json.JsonProperty("measurements", Required = Newtonsoft.Json.Required.Always)]
         [System.ComponentModel.DataAnnotations.Required]
         public System.Collections.Generic.ICollection<FlowmeterMeasurementData> Measurements { get; set; } = new System.Collections.ObjectModel.Collection<FlowmeterMeasurementData>();
@@ -1333,6 +1330,10 @@ namespace Sunp.Api.Client {
         [Newtonsoft.Json.JsonProperty("sourceTankId", Required = Newtonsoft.Json.Required.Always)]
         public long SourceTankId { get; set; }
 
+        [Newtonsoft.Json.JsonProperty("renterXin", Required = Newtonsoft.Json.Required.Always)]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string RenterXin { get; set; }
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "13.15.8.0 (NJsonSchema v10.6.7.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -1372,17 +1373,20 @@ namespace Sunp.Api.Client {
         [System.Runtime.Serialization.EnumMember(Value = @"Filling")]
         Filling = 1,
 
+        [System.Runtime.Serialization.EnumMember(Value = @"FillingRenter")]
+        FillingRenter = 2,
+
         [System.Runtime.Serialization.EnumMember(Value = @"RefundDefective")]
-        RefundDefective = 2,
+        RefundDefective = 3,
 
         [System.Runtime.Serialization.EnumMember(Value = @"Refund")]
-        Refund = 3,
+        Refund = 4,
 
         [System.Runtime.Serialization.EnumMember(Value = @"InternalDisplacement")]
-        InternalDisplacement = 4,
+        InternalDisplacement = 5,
 
         [System.Runtime.Serialization.EnumMember(Value = @"Incoming")]
-        Incoming = 5,
+        Incoming = 6,
 
     }
 
