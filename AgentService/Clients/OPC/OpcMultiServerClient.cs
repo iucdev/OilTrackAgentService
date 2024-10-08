@@ -184,6 +184,7 @@ namespace Service.Clients.OPC {
                     tableBuilder.AppendLine($"OilProductName: {source.FlowmeterIndicatorParams.OilProductType}");
                     tableBuilder.AppendLine($"OperationType: {source.FlowmeterIndicatorParams.OperationType}");
                     tableBuilder.AppendLine($"SourceTankId: {source.FlowmeterIndicatorParams.SourceTankId}");
+                    tableBuilder.AppendLine($"RenterXin: {source.FlowmeterIndicatorParams.RenterXin}");
                     tableBuilder.AppendLine("------------------------------");
 
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.TotalMass);
@@ -194,6 +195,7 @@ namespace Service.Clients.OPC {
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.OilProductType);
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.OperationType);
                     items.AddIfNotNull(source.FlowmeterIndicatorParams.SourceTankId);
+                    items.AddIfNotNull(source.FlowmeterIndicatorParams.RenterXin);
 
                     var itemArray = items.ToArray();
                     itemArray = _flowmeterGroupReport.AddItems(itemArray);
@@ -264,6 +266,7 @@ namespace Service.Clients.OPC {
                     measurement.CurrentTemperature = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.CurrentTemperature, Logger);
 
                     flowmeterMeasurement.Measurements = new[] { measurement }.SetEnums(source, OpcHelpers.TryGetOilProductType(flowmeterMeasurementResults, flowmeterParams.OilProductType, Logger));
+                    measurement.RenterXin = OpcHelpers.TryGetString(flowmeterMeasurementResults, flowmeterParams.RenterXin, Logger);
                     Logger.Debug("FlowmeterMeasurements Model Filled with values");
 
                     var tableBuilder = new StringBuilder();
@@ -275,6 +278,9 @@ namespace Service.Clients.OPC {
                     tableBuilder.AppendLine($"CurrentDensity: {measurement.CurrentDensity}");
                     tableBuilder.AppendLine($"CurrentTemperature: {measurement.CurrentTemperature}");
                     tableBuilder.AppendLine($"OilProductType: {measurement.OilProductType}");
+                    tableBuilder.AppendLine($"OperationType: {measurement.OperationType}");
+                    tableBuilder.AppendLine($"SourceTankId: {measurement.SourceTankId}");
+                    tableBuilder.AppendLine($"RenterXin: {measurement.RenterXin}");
 
                     var itemsStr = string.Format("Source '{0}'", source.ExternalId.Value);
 

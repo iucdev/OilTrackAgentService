@@ -205,6 +205,7 @@ namespace Service.Clients.Utils {
         public string OilProductType { get; set; }
         public string OperationType { get; set; }
         public string SourceTankId { get; set; }
+        public string RenterXin { get; set; }
     }
 
     public class TankMeasurementParams {

@@ -106,6 +106,17 @@ namespace Service.Clients.OPC {
             return val == null ? string.Empty : val.ToString().Replace("\0", string.Empty);
         }
 
+        public static string TryGetString(ItemValueResult[] itemValueResults, string searchedItemName, Logger logger)
+        {
+            var result = OpcHelpers.GetValueByName(itemValueResults, searchedItemName, logger).Value;
+            if (string.IsNullOrEmpty(ToSafeString(result))) {
+                logger.Error("Param {0} Result is null or Empty", searchedItemName, result);
+                throw new InvalidOperationException();
+            }
+            var rawVal = ToSafeString(result);
+            return rawVal;
+        }
+
         public static OilProductType TryGetOilProductType(ItemValueResult[] itemValueResults, string searchedItemName, Logger logger)
         {
             var result = OpcHelpers.GetValueByName(itemValueResults, searchedItemName, logger).Value;

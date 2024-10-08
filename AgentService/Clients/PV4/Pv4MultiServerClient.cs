@@ -112,20 +112,20 @@ namespace Service.Clients.PV4 {
             }
         }
 
-        private TankTransfers collectTransfers(TankMeasurementDataPv4Dto tankMeasurementDataPv4Dto) {
+        private TankTransfers collectTransfers(ObjectSource source) {
             try {
                 Logger.Debug("Collect transfers");
                 var tankTransfers = new TankTransfers {
-                    TankId = tankMeasurementDataPv4Dto.ExternalId
+                    TankId = source.ExternalId.Value
                 };
-                var tankNumber = tankMeasurementDataPv4Dto.SourceName.PadLeft(2, '0');
+                var tankNumber = source.InternalId.PadLeft(2, '0');
                 for (int i = 1; i <= 10; i++) {
-                    tankNumber = tankMeasurementDataPv4Dto.SourceName.PadLeft(2, '0') + i.ToString().PadLeft(2, '0');
+                    tankNumber = source.InternalId.PadLeft(2, '0') + i.ToString().PadLeft(2, '0');
                     if (DeliveryEnquiryExt(tankNumber) == 0) {
                         _tankTransfers = null;
                     }
                     if (_tankTransfers != null && _tankTransfers.Count > 0) {
-                        tankTransfers.Transfers = _tankTransfers.Where(t => t.EndDate != null).ToArray().SetEnums(tankMeasurementDataPv4Dto.ObjectSource);
+                        tankTransfers.Transfers = _tankTransfers.Where(t => t.EndDate != null).ToArray().SetEnums(source);
                     }
                 }
                 return tankTransfers;
@@ -149,8 +149,8 @@ namespace Service.Clients.PV4 {
                         }
                     }
 
-                    foreach (var value in _tankLevelsSourceValue) {
-                        var transfers = collectTransfers(value);
+                    foreach (var source in @object.ObjectSources) {
+                        var transfers = collectTransfers(source);
                         if (transfers != null) {
                             tanksTransfers.Add(transfers);
                         }
