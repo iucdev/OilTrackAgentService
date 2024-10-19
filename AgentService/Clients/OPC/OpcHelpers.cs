@@ -136,8 +136,9 @@ namespace Service.Clients.OPC {
                 logger.Error("Param {0} Result is null or Empty", searchedItemName, result);
                 throw new InvalidOperationException();
             }
+            var opType = FlowmeterOperationType.Undefined;
             var rawVal = ToSafeString(result);
-            if (!Enum.TryParse<FlowmeterOperationType>(rawVal, out var opType)) {
+            if (!Enum.TryParse<FlowmeterOperationType>(rawVal, out opType)) {
                 logger.Error($"Exception found. Unexpected operation type: {rawVal}.");
             }
             return opType;

@@ -34,26 +34,25 @@ namespace Service.Clients.DBO {
 
             //logger.Debug(stringBuilder.ToString());
 
-            var StartDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.StartTime}"));
-            var EndDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.EndTime}"));
-            var MassStart = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.MassStart}")), 2));
-            var MassEnd = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.MassFinish}")), 2));
-            var LevelStart = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelStart}")), 2));
-            var LevelEnd = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelFinish}")), 2));
-            var VolumeStart = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeStart}")), 2));
-            var VolumeEnd = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeFinish}")), 2));
-
+            var startDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.StartTime}"));
+            var endDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.EndTime}"));
+            var massStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.MassStart}")), 3);
+            var massEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.MassFinish}")), 3);
+            var levelStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelStart}")), 3);
+            var levelEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelFinish}")), 3);
+            var volumeStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeStart}")), 3);
+            var volumeEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeFinish}")), 3);
 
             var data = new TankTransferData
             {
-                StartDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.StartTime}")),
-                EndDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.EndTime}")),
-                MassStart = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.MassStart}")), 2)),
-                MassEnd = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.MassFinish}")), 2)),
-                LevelStart = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelStart}")), 2)),
-                LevelEnd = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelFinish}")), 2)),
-                VolumeStart = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeStart}")), 2)),
-                VolumeEnd = Convert.ToDecimal(Math.Round(reader.GetDouble(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeFinish}")), 2)),
+                StartDate = startDate,
+                EndDate = endDate,
+                MassStart = massStart,
+                MassEnd = massEnd,
+                LevelStart = levelStart,
+                LevelEnd = levelEnd,
+                VolumeStart = volumeStart,
+                VolumeEnd = volumeEnd,
                 OilProductType = CommonHelper.TryGetOilProductType(reader.GetString(reader.GetOrdinal($"{objectSource.TankTransferParams.OilProductType}")), logger),
                 LevelUnitType = objectSource.LevelUnitType.Value,
                 MassUnitType = objectSource.MassUnitType.Value,
@@ -105,11 +104,11 @@ namespace Service.Clients.DBO {
                 var value = reader.GetValue(ordinal);
 
                 if (value is double doubleValue) {
-                    return Convert.ToDecimal(Math.Round(doubleValue, 2));
+                    return Convert.ToDecimal(Math.Round(doubleValue, 3));
                 } else if (value is float floatValue) {
-                    return Convert.ToDecimal(Math.Round(floatValue, 2));
+                    return Convert.ToDecimal(Math.Round(floatValue, 3));
                 } else if (value is decimal decimalValue) {
-                    return Math.Round(decimalValue, 2);
+                    return Math.Round(decimalValue, 3);
                 }
             }
 
@@ -118,21 +117,41 @@ namespace Service.Clients.DBO {
 
         private static FlowmeterMeasurementData ReadFlowmeterMeasurementFromDb(this DbDataReader reader, ObjectSource objectSource, Logger logger)
         {
-            var data = new FlowmeterMeasurementData
-            {
-                TotalMass = reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.TotalMass}")),
-                FlowMass = reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.FlowMass}")),
-                TotalVolume = reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.TotalVolume}")),
-                CurrentDensity = reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.CurrentDensity}")),
-                CurrentTemperature = reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.CurrentTemperature}")),
-                MeasurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.DateTimeStamp}")),
+            var totalMass = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.TotalMass}")), 3);
+            var flowMass = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.FlowMass}")), 3);
+            var totalVolume = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.TotalVolume}")), 3);
+            var currentDensity = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.CurrentDensity}")), 3);
+            var currentTemperature = reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.CurrentTemperature}"));
+            var measurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.DateTimeStamp}"));
+            var oilProductTypeRaw = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OilProductType}"));
+            var opTypeRaw = reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OperationType}");
+            var sourceTankIdRaw = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.SourceTankId}"));
+            var renterXin = string.Empty;
+            try {
+                renterXin = reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.RenterXin}").ToString();
+            } catch (Exception) {
+                try {
+                    renterXin = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.RenterXin}"));
+                } catch (Exception e) {
+                    renterXin = "";
+                }
+            }
+
+            var data = new FlowmeterMeasurementData {
+                TotalMass = totalMass,
+                FlowMass = flowMass,
+                TotalVolume = totalVolume,
+                CurrentDensity = currentDensity,
+                CurrentTemperature = currentTemperature,
+                MeasurementDate = measurementDate,
                 MassUnitType = objectSource.MassUnitType.Value,
-                OilProductType = CommonHelper.TryGetOilProductType(reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OilProductType}")), logger),
-                OperationType = Enum.TryParse<FlowmeterOperationType>(reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OilProductType}")), out var parsedOpType) 
+                OilProductType = CommonHelper.TryGetOilProductType(oilProductTypeRaw, logger),
+                OperationType = Enum.TryParse<FlowmeterOperationType>(opTypeRaw.ToString(), out var parsedOpType) 
                     ? parsedOpType
                     : FlowmeterOperationType.Undefined,
-                SourceTankId = CommonHelper.TryGetSourceTankId(reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.SourceTankId}")), objectSource),
-                VolumeUnitType = objectSource.VolumeUnitType.Value
+                SourceTankId = CommonHelper.TryGetSourceTankId(sourceTankIdRaw, objectSource),
+                VolumeUnitType = objectSource.VolumeUnitType.Value,
+                RenterXin = renterXin
             };
             return data;
         }

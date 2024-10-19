@@ -265,7 +265,7 @@ namespace Service.Clients.OPC {
                     measurement.CurrentDensity = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.CurrentDensity, Logger);
                     measurement.CurrentTemperature = OpcHelpers.TryGetDecimal(flowmeterMeasurementResults, flowmeterParams.CurrentTemperature, Logger);
 
-                    flowmeterMeasurement.Measurements = new[] { measurement }.SetEnums(source, OpcHelpers.TryGetOilProductType(flowmeterMeasurementResults, flowmeterParams.OilProductType, Logger));
+                    flowmeterMeasurement.Measurements = new[] { measurement }.SetEnums(source, OpcHelpers.TryGetFlowmeterOperationType(flowmeterMeasurementResults, flowmeterParams.OperationType, Logger), OpcHelpers.TryGetOilProductType(flowmeterMeasurementResults, flowmeterParams.OilProductType, Logger));
                     measurement.RenterXin = OpcHelpers.TryGetString(flowmeterMeasurementResults, flowmeterParams.RenterXin, Logger);
                     Logger.Debug("FlowmeterMeasurements Model Filled with values");
 

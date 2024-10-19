@@ -54,9 +54,10 @@ namespace Service.Common {
             return items;
         }
 
-        public static FlowmeterMeasurementData[] SetEnums(this FlowmeterMeasurementData[] items, ObjectSource source, OilProductType? oilProductType = null)
+        public static FlowmeterMeasurementData[] SetEnums(this FlowmeterMeasurementData[] items, ObjectSource source, FlowmeterOperationType operationType, OilProductType? oilProductType = null)
         {
             foreach (var i in items) {
+                i.OperationType = operationType;
                 i.OilProductType = oilProductType.HasValue ? oilProductType.Value : source.OilProductType;
                 i.MassUnitType = source.MassUnitType;
                 i.VolumeUnitType = source.VolumeUnitType;
