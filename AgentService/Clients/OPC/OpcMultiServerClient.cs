@@ -419,12 +419,11 @@ namespace Service.Clients.OPC {
                 var tanksMeasurements = new List<TankMeasurements>();
                 var flowmeterMeasurements = new List<FlowmeterMeasurements>();
                 var tanksTransfers = new List<TankTransfers>();
-                foreach (var source in ObjectSettings.Objects.First().ObjectSources) {
-                    Logger.Debug($"Object ID {ObjectSettings.Objects.First().ObjectId}");
-                    tanksMeasurements.AddRange(collectTankMeasurements(tankMeasurementResults));
-                    tanksTransfers.AddRange(collectTankTransfers(tankTransferResults));
-                    flowmeterMeasurements.AddRange(collectFlowmeterIndicators(flowmeterMeasurementResults));
-                }
+
+                Logger.Debug($"Object ID {ObjectSettings.Objects.First().ObjectId}");
+                tanksMeasurements.AddRange(collectTankMeasurements(tankMeasurementResults));
+                tanksTransfers.AddRange(collectTankTransfers(tankTransferResults));
+                flowmeterMeasurements.AddRange(collectFlowmeterIndicators(flowmeterMeasurementResults));
 
                 QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
                 QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
