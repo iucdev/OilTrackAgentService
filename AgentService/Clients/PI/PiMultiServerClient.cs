@@ -137,34 +137,62 @@ namespace Service.Clients.PI {
         private TankMeasurements GetTankMeasurements(ObjectSource source) {
             var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value };
             var parameter = source.TankMeasurementParams;
-            var measurement = new TankMeasurementData() {
-                MeasurementDate = PiMultiServerClientHelpers.GetDateTime(Snapshot(parameter.DateTimeStamp)),
-                Density = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Density)),
-                Level = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Level)),
-                Mass = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Mass)),
-                Volume = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Volume)),
-                Temperature = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Temperature)),
-                LevelUnitType = source.LevelUnitType.Value,
-                MassUnitType = source.MassUnitType.Value,
-                VolumeUnitType = source.VolumeUnitType.Value,
-                OilProductType = source.OilProductType.Value
-            };
-            tankMeasurements.Measurements = new[] { measurement }.SetEnums(source);
+            var measurement = new TankMeasurementData();
+
+            measurement.MeasurementDate = string.IsNullOrEmpty(parameter.DateTimeStamp) ? DateTime.Now : PiMultiServerClientHelpers.GetDateTime(Snapshot(parameter.DateTimeStamp));
+            measurement.Density = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Density));
+            measurement.Level = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Level));
+            measurement.Mass = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Mass));
+            measurement.Volume = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Volume));
+            measurement.Temperature = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Temperature));
+            var oilProductTypeRaw = PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.OilProductType).Value);
+            var parsedOilProductType = CommonHelper.TryGetOilProductType(oilProductTypeRaw, Logger);
+
+            tankMeasurements.Measurements = new[] { measurement }.SetEnums(source, oilProductType: parsedOilProductType);
             return tankMeasurements;
+        }
+
+        private FlowmeterMeasurements GetFlowmeterMeasurements(ObjectSource source)
+        {
+            var flowmeterMeasurements = new FlowmeterMeasurements() { FlowmeterId = source.ExternalId.Value };
+            var parameter = source.FlowmeterIndicatorParams;
+            var measurement = new FlowmeterMeasurementData();
+
+            measurement.MeasurementDate = string.IsNullOrEmpty(parameter.DateTimeStamp) ? DateTime.Now : PiMultiServerClientHelpers.GetDateTime(Snapshot(parameter.DateTimeStamp));
+            measurement.TotalMass = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.TotalMass));
+            measurement.FlowMass = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.FlowMass));
+            measurement.TotalVolume = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.TotalVolume));
+            measurement.CurrentDensity = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.CurrentDensity));
+            measurement.CurrentTemperature= PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.CurrentTemperature));
+            measurement.SourceTankId = CommonHelper.TryGetSourceTankId(PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.SourceTankId)), source);
+            var oilProductTypeRaw = PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.OilProductType).Value);
+            var parsedOilProductType = CommonHelper.TryGetOilProductType(oilProductTypeRaw, Logger);
+            var operationTypeRaw = PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.OilProductType).Value);
+            var parsedOperationType = CommonHelper.TryGetFlowmeterOperationType(operationTypeRaw, Logger);
+
+            flowmeterMeasurements.Measurements = new[] { measurement }.SetEnums(source, operationType: parsedOperationType, oilProductType: parsedOilProductType);
+            return flowmeterMeasurements;
         }
 
         protected override void CollectData()
         {
             Logger.Debug("Call CollectData");
 
-            try
-            {
+            try {
                 var tanksMeasurements = new List<TankMeasurements>();
+                var flowmeterMeasurements = new List<FlowmeterMeasurements>();
+
                 foreach (var source in ObjectSettings.Objects.First().ObjectSources) {
-                    tanksMeasurements.Add(GetTankMeasurements(source));
+                    if (source.TankMeasurementParams != null) {
+                        tanksMeasurements.Add(GetTankMeasurements(source));
+                    }
+                    if (source.FlowmeterIndicatorParams != null) {
+                        flowmeterMeasurements.Add(GetFlowmeterMeasurements(source));
+                    }
                 }
 
                 QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
+                QueueTaskService.Instance.SaveFlowmeterAsTask(flowmeterMeasurements.ToArray());
             }
             catch (Exception ex)
             {

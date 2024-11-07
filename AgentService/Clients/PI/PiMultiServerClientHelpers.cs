@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Service.Clients.PI {
     public class PiMultiServerClientHelpers {
@@ -22,7 +18,7 @@ namespace Service.Clients.PI {
             return decimal.Parse(ToSafeString(pointData.Value).Replace(',', '.'), CultureInfo.InvariantCulture);
         }
 
-        private static string ToSafeString(object val) {
+        public static string ToSafeString(object val) {
             return val == null ? string.Empty : val.ToString().Replace("\0", string.Empty);
         }
 

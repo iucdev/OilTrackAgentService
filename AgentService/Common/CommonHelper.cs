@@ -1,6 +1,8 @@
 ﻿using NLog;
+using Opc.Hda;
 using Service.Clients.Utils;
 using Sunp.Api.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,6 +16,14 @@ namespace Service.Common {
                 logger.Error($"Не удалось найти вид нефтепродукта в маппинге для значения {rawVal}. Пожалуйста, добавьте это значение в маппинг в objectSettings.json");
                 return OilProductType.UNKNOWN;
             }
+        }
+        
+        public static FlowmeterOperationType TryGetFlowmeterOperationType(string rawVal, Logger logger) {
+            var opType = FlowmeterOperationType.Undefined;
+            if (!Enum.TryParse<FlowmeterOperationType>(rawVal, out opType)) {
+                logger.Error($"Exception found. Unexpected operation type: {rawVal}.");
+            }
+            return opType;
         }
 
         public static long TryGetSourceTankId(string rawVal, ObjectSource objectSource) {
