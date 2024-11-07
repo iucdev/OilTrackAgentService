@@ -83,7 +83,7 @@ namespace Service.Clients.DBO {
             var measurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankMeasurementParams.DateTimeStamp}"));
             var density = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Density);
             var oilProductTypeOrdinal = reader.GetOrdinal($"{objectSource.TankMeasurementParams.OilProductType}");
-            var oilProductTypeRaw = !reader.IsDBNull(oilProductTypeOrdinal) ? reader.GetString(oilProductTypeOrdinal) : null;
+            var oilProductTypeRaw = !reader.IsDBNull(oilProductTypeOrdinal) ? reader.GetString(oilProductTypeOrdinal) : string.Empty;
             var data = new TankMeasurementData {
                 Temperature = temperature,
                 Level = level,
