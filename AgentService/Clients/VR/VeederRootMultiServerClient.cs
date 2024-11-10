@@ -430,7 +430,7 @@ namespace Service.Clients.VR {
                     Logger.Debug($"fillDTVR invalid date. Year {yy}, month {mm}, day {dd}, hours {hh}, minutes {mn}");
                     return null;
                 }
-                if (yy == 0 || mm == 0 || dd == 0 || hh == 0 || mn == 0) {
+                if (yy == 0 || mm == 0 || dd == 0) {
                     Logger.Debug($"fillDTVR end of buf. Year {yy}, month {mm}, day {dd}, hours {hh}, minutes {mn}");
                     return null;
                 }

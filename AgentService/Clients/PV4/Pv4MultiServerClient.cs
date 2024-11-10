@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NLog;
 using Service.Clients.Client;
 using Service.Clients.Scheduler;
 using Service.Clients.Utils;
@@ -18,6 +19,33 @@ namespace Service.Clients.PV4 {
         private List<TankMeasurementDataPv4Dto> _productWeightSourceValue = new List<TankMeasurementDataPv4Dto>();
         private List<TankMeasurementDataPv4Dto> _tankLevelsSourceValue = new List<TankMeasurementDataPv4Dto>();
         private List<TankTransferData> _tankTransfers = new List<TankTransferData>();
+
+        private decimal getDecimal(string val, Logger logger) {
+            try {
+                return Convert.ToDecimal(val, CultureInfo.InvariantCulture);
+            } catch (Exception ex) {
+                logger.Error("Error on getDecimal: from string={0}", val);
+                throw ex;
+            }
+        }
+        
+        private decimal getDecimal(int val, Logger logger) {
+            try {
+                return Convert.ToDecimal(val, CultureInfo.InvariantCulture);
+            } catch (Exception ex) {
+                logger.Error("Error on getDecimal: from int={0}", val);
+                throw ex;
+            }
+        }
+
+        private decimal getDecimal(float val, Logger logger) {
+            try {
+                return Convert.ToDecimal(val, CultureInfo.InvariantCulture);
+            } catch (Exception ex) {
+                logger.Error("Error on getDecimal: from float={0}", val);
+                throw ex;
+            }
+        }
 
         public Pv4MultiServerClient(ObjectSettings objectSettings, NamedBackgroundWorker worker)
         {
@@ -98,7 +126,7 @@ namespace Service.Clients.PV4 {
 
                     ProductDensityCMD(value.SourceName.PadLeft(2, '0'));
                     var tempd = GetValue(13, 10);
-                    value.Data.Density = tempd.HasValue ? decimal.Parse((tempd.Value * 0.000001d).ToString(CultureInfo.InvariantCulture)) : 0m;
+                    value.Data.Density = tempd.HasValue ? getDecimal((tempd.Value * 0.000001d).ToString(CultureInfo.InvariantCulture), Logger) : 0m;
 
                     Logger.Info("Tank {0,2}| Lev {1,8}| Vol {2,5}| Temp {3,4}| Mass {4,8}| Dens {5,11}",
                         value.SourceName, value.Data.Level, value.Data.Volume, value.Data.Temperature, value.Data.Mass, value.Data.Density);
@@ -602,12 +630,12 @@ namespace Service.Clients.PV4 {
 
                     var mul = u.ToString(CultureInfo.InvariantCulture).ToUpper() == "L" ? 0.01f : 0.001f;
                     var ppppppp = GetValue(pos, 7);
-                    sourceValue.Data.Level = ppppppp.HasValue ? decimal.Parse((ppppppp.Value * mul).ToString(CultureInfo.InvariantCulture)) : 0m;
+                    sourceValue.Data.Level = ppppppp.HasValue ? getDecimal((ppppppp.Value * mul).ToString(CultureInfo.InvariantCulture), Logger) : 0m;
 
                     pos += 14;
 
                     var PPPPP = GetValue(pos, 5);
-                    sourceValue.Data.Volume = decimal.Parse(ToStr(PPPPP, CultureInfo.InstalledUICulture));
+                    sourceValue.Data.Volume = getDecimal(ToStr(PPPPP, CultureInfo.InstalledUICulture), Logger);
 
                     pos += 14;
 
@@ -622,7 +650,7 @@ namespace Service.Clients.PV4 {
                     }
                     pos += 5;//+'='
 
-                    sourceValue.Data.Temperature = decimal.Parse(tttt.ToString(CultureInfo.InvariantCulture));
+                    sourceValue.Data.Temperature = getDecimal(tttt.ToString(CultureInfo.InvariantCulture), Logger);
                     sourceValues.Add(sourceValue);
                 }
             } catch (Exception e) {
@@ -679,12 +707,12 @@ namespace Service.Clients.PV4 {
 
                     var mul = u.ToString(CultureInfo.InvariantCulture).ToUpper() == "L" ? 0.01f : 0.001f;
                     var ppppppp = GetValue(pos, 7);
-                    sourceValue.Data.Level = ppppppp.HasValue ? decimal.Parse((ppppppp.Value * mul).ToString(CultureInfo.InvariantCulture)) : 0m;
+                    sourceValue.Data.Level = ppppppp.HasValue ? getDecimal((ppppppp.Value * mul).ToString(CultureInfo.InvariantCulture), Logger) : 0m;
 
                     pos += 14;
 
                     var PPPPP = GetValue(pos, 5);
-                    sourceValue.Data.Volume = decimal.Parse(ToStr(PPPPP, CultureInfo.InstalledUICulture));
+                    sourceValue.Data.Volume = getDecimal(ToStr(PPPPP, CultureInfo.InstalledUICulture), Logger);
 
                     pos += 14;
 
@@ -697,7 +725,7 @@ namespace Service.Clients.PV4 {
                         tttt = tempt.HasValue ? tempt.Value * 0.1f : 0.0f;
                     }
                     pos += 4;
-                    sourceValue.Data.Temperature = decimal.Parse(tttt.ToString(CultureInfo.InvariantCulture));
+                    sourceValue.Data.Temperature = getDecimal(tttt.ToString(CultureInfo.InvariantCulture), Logger);
 
                     pos += 14;
 
@@ -749,11 +777,11 @@ namespace Service.Clients.PV4 {
                     pos++;
 
                     var aaaaaaaa = GetValue(pos, 8);
-                    sourceValue.Data.Mass = decimal.Parse(ToStr(aaaaaaaa, CultureInfo.InvariantCulture));
+                    sourceValue.Data.Mass = getDecimal(ToStr(aaaaaaaa, CultureInfo.InvariantCulture), Logger);
                     pos += 8;
 
                     var bbbbbbbb = GetValue(pos, 8);// * 0.0001f;
-                    sourceValue.Data.Density = bbbbbbbb.HasValue ? decimal.Parse((bbbbbbbb.Value * 0.0001f).ToString(CultureInfo.InvariantCulture)) : 0m;
+                    sourceValue.Data.Density = bbbbbbbb.HasValue ? getDecimal((bbbbbbbb.Value * 0.0001f).ToString(CultureInfo.InvariantCulture), Logger) : 0m;
 
                     pos += 13;
 
@@ -803,11 +831,11 @@ namespace Service.Clients.PV4 {
                     pos++;
 
                     var aaaaaaaaaa = GetValue(pos, 10);
-                    sourceValue.Data.Mass = decimal.Parse(ToStr(aaaaaaaaaa, CultureInfo.InvariantCulture));
+                    sourceValue.Data.Mass = getDecimal(ToStr(aaaaaaaaaa, CultureInfo.InvariantCulture), Logger);
                     pos += 10;
 
                     var bbbbbbbb = GetValue(pos, 8);
-                    sourceValue.Data.Density = bbbbbbbb.HasValue ? decimal.Parse((bbbbbbbb.Value * 0.0001f).ToString(CultureInfo.InvariantCulture)) : 0m;
+                    sourceValue.Data.Density = bbbbbbbb.HasValue ? getDecimal((bbbbbbbb.Value * 0.0001f).ToString(CultureInfo.InvariantCulture), Logger) : 0m;
 
                     pos += 13;
 
@@ -848,7 +876,7 @@ namespace Service.Clients.PV4 {
                 if (eDateTime == null) return null;
                 tr.EndDate = (DateTime)eDateTime;
 
-                tr.VolumeEnd = GetValue(stuff.ooooo).HasValue ? decimal.Parse(GetValue(stuff.ooooo).ToString()) : 0m;
+                tr.VolumeEnd = GetValue(stuff.ooooo).HasValue ? getDecimal(GetValue(stuff.ooooo).ToString(), Logger) : 0m;
                 if (tr.VolumeEnd == 0) return null;
 
                 var tttt = GetValue(stuff.tttt) * 0.1f;
@@ -896,14 +924,14 @@ namespace Service.Clients.PV4 {
                 if (eDateTime == null) return null;
                 tr.EndDate = (DateTime)eDateTime;
 
-                tr.VolumeEnd = GetValue(stuff.ooooo).HasValue ? decimal.Parse(GetValue(stuff.ooooo).ToString()) : 0m;
+                tr.VolumeEnd = GetValue(stuff.ooooo).HasValue ? getDecimal(GetValue(stuff.ooooo).ToString(), Logger) : 0m;
                 if (tr.VolumeEnd == 0) {
                     var msg = "Transfer Volume is 0";
                     Logger.Info(msg);
                     throw new Exception(msg);
                 }
 
-                var zzzzzzz = GetValue(stuff.zzzzzzz).HasValue ? decimal.Parse(GetValue(stuff.zzzzzzz).ToString()) : 0m;
+                var zzzzzzz = GetValue(stuff.zzzzzzz).HasValue ? getDecimal(GetValue(stuff.zzzzzzz).ToString(), Logger) : 0m;
                 if (zzzzzzz == 0) {
                     var msg = "Weight is X|0";
                     Logger.Info(msg);
