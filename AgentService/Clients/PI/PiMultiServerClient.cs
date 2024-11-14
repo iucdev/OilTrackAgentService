@@ -12,8 +12,8 @@ using System.Linq;
 using Service.Common;
 
 namespace Service.Clients.PI {
-    public class PiMultiServerClient : AMultiServerClient
-    {
+    public class PiMultiServerClient : AMultiServerClient 
+        {
         private Server _piServer;
         private PISDK.PISDK _piSdk;
         private RSMDBProxy _rsproxy;
@@ -29,10 +29,10 @@ namespace Service.Clients.PI {
         {
             Logger.Debug("Start Init");
             base.Init();
-            try
-            {
-                if (_piSdk == null || _piServer == null)
+            try 
                 {
+                if (_piSdk == null || _piServer == null) 
+                    {
                     _piSdk = new PISDK.PISDK();
                     var serverName = string.IsNullOrEmpty(ObjectSettings.IpConnectionConfig.IpAddress) ? _piSdk.Servers.DefaultServer.Name : ObjectSettings.IpConnectionConfig.IpAddress;
                     _piServer = _piSdk.Servers[serverName];
@@ -45,8 +45,8 @@ namespace Service.Clients.PI {
 
                 // Todo: send to api IncidentUtil.PutIncident(IncidentKind.DeviceConnectionLoose, Task.ObjectId);
                 throw new Exception("PI is closed!");
-            }
-            catch (Exception e)
+            } 
+            catch (Exception e) 
             {
                 Logger.Error(e);
             }
@@ -66,12 +66,12 @@ namespace Service.Clients.PI {
 
         private bool IsPiOpen()
         {
-            try
-            {
+            try 
+                {
                 if (!_piServer.Connected)
                     _piServer.Open();
-            }
-            catch (Exception e)
+            } 
+            catch (Exception e) 
             {
                 Logger.Error(e);
                 return false;
@@ -81,11 +81,11 @@ namespace Service.Clients.PI {
 
         private bool IsPiClose()
         {
-            try
-            {
+            try 
+                {
                 if (_piServer.Connected)
                     _piServer.Close();
-            }
+            } 
             catch (Exception e)
             {
                 Logger.Error(e);
@@ -93,46 +93,6 @@ namespace Service.Clients.PI {
             }
             return true;
         }
-
-        //protected override void RefreshTransfers()
-        //{
-            //try
-            //{
-            //    Logger.Debug("Call RefreshTransfers");
-
-            //    var dtS = DateTime.Now.Date;
-            //    var dtE = DateTime.Now;
-
-            //    if (_rsproxy == null)
-            //        return;
-
-            //    var listTr = _rsproxy.GetTransfers(dtS, dtE);
-
-            //    if (listTr == null)
-            //    {
-            //        Logger.Debug("Transfer List is empty");
-            //        return;
-            //    }
-
-            //    var tankTransfers = new List<TankTransferData>();
-
-            //    foreach (var transfer in listTr)
-            //    {
-            //        tankTransfers.Add(new TankTransferData()
-            //        {
-            //            StartDate = transfer.StartTime,
-            //            EndDate = transfer.EndTime
-            //            откуда брать остальные данные?
-            //        }); 
-            //    }
-
-            //    _sunpApiClientUtil.SendTanksTransfers(tankTransfers, _task);
-            //}
-            //catch (Exception e)
-            //{
-            //    Logger.Error($"ERROR on RefreshTransfers - {e.Message + e.StackTrace}");
-            //}
-        //}
 
         private TankMeasurements GetTankMeasurements(ObjectSource source) {
             var tankMeasurements = new TankMeasurements() { TankId = source.ExternalId.Value };
@@ -145,14 +105,14 @@ namespace Service.Clients.PI {
             measurement.Mass = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Mass));
             measurement.Volume = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Volume));
             measurement.Temperature = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.Temperature));
-            var oilProductTypeRaw = PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.OilProductType).Value);
+            var oilProductTypeRaw = PiMultiServerClientHelpers.ToSafeStringWithEncoding(Snapshot(parameter.OilProductType).Value);
             var parsedOilProductType = CommonHelper.TryGetOilProductType(oilProductTypeRaw, Logger);
 
             tankMeasurements.Measurements = new[] { measurement }.SetEnums(source, oilProductType: parsedOilProductType);
             return tankMeasurements;
         }
 
-        private FlowmeterMeasurements GetFlowmeterMeasurements(ObjectSource source)
+        private FlowmeterMeasurements GetFlowmeterMeasurements(ObjectSource source) 
         {
             var flowmeterMeasurements = new FlowmeterMeasurements() { FlowmeterId = source.ExternalId.Value };
             var parameter = source.FlowmeterIndicatorParams;
@@ -163,12 +123,14 @@ namespace Service.Clients.PI {
             measurement.FlowMass = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.FlowMass));
             measurement.TotalVolume = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.TotalVolume));
             measurement.CurrentDensity = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.CurrentDensity));
-            measurement.CurrentTemperature= PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.CurrentTemperature));
+            measurement.CurrentTemperature = PiMultiServerClientHelpers.GetDecimal(Snapshot(parameter.CurrentTemperature));
             measurement.SourceTankId = CommonHelper.TryGetSourceTankId(PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.SourceTankId)), source);
-            var oilProductTypeRaw = PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.OilProductType).Value);
+            measurement.RenterXin = PiMultiServerClientHelpers.ToSafeStringWithEncoding(Snapshot(parameter.RenterXin).Value);
+            var oilProductTypeRaw = PiMultiServerClientHelpers.ToSafeStringWithEncoding(Snapshot(parameter.OilProductType).Value);
             var parsedOilProductType = CommonHelper.TryGetOilProductType(oilProductTypeRaw, Logger);
-            var operationTypeRaw = PiMultiServerClientHelpers.ToSafeString(Snapshot(parameter.OilProductType).Value);
+            var operationTypeRaw = PiMultiServerClientHelpers.ToSafeStringWithEncoding(Snapshot(parameter.OperationType).Value);
             var parsedOperationType = CommonHelper.TryGetFlowmeterOperationType(operationTypeRaw, Logger);
+
 
             flowmeterMeasurements.Measurements = new[] { measurement }.SetEnums(source, operationType: parsedOperationType, oilProductType: parsedOilProductType);
             return flowmeterMeasurements;
@@ -193,46 +155,47 @@ namespace Service.Clients.PI {
 
                 QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
                 QueueTaskService.Instance.SaveFlowmeterAsTask(flowmeterMeasurements.ToArray());
-            }
+            } 
             catch (Exception ex)
             {
                 Logger.Error($"Error on collect data {ex.Message + ex.StackTrace}");
             }
         }
 
-        protected override bool Fill(int bytesRec)
+        protected override bool Fill(int bytesRec) 
         {
             return true;
         }
 
-        protected override bool SkipCmd()
+        protected override bool SkipCmd() 
         {
             return false;
         }
 
-        protected override bool CheckRb(int bytesRec)
+        protected override bool CheckRb(int bytesRec) 
         {
             return true;
         }
 
-        
 
-        private PointData Snapshot(string tagName)
+
+        private PointData Snapshot(string tagName) 
         {
             PointData data = null;
-            try
-            {
-                var tag = GetPoint(tagName);
-                if (tag != null)
+            try 
                 {
-                    var value = tag.Data.Snapshot;
-                    if (value != null)
+                var tag = GetPoint(tagName);
+                if (tag != null) 
                     {
+                    var value = tag.Data.Snapshot;
+
+                    if (value != null)
+                        {
                         data = new PointData(tag.Name, value.Value is DigitalState ? ((DigitalState)value.Value).Name : value.Value, value.TimeStamp.LocalDate);
                         Logger.Debug($"SnapshotValue {data.Name} = {data.Value} ({data.DateTimeStamp})");
                     }
                 }
-            }
+            } 
             catch (Exception e)
             {
                 Logger.Error(e);
@@ -240,15 +203,15 @@ namespace Service.Clients.PI {
             return data;
         }
 
-        private PIPoint GetPoint(string tagName)
+        private PIPoint GetPoint(string tagName) 
         {
             PIPoint pt = null;
-            try
-            {
+            try 
+                {
                 if (_piServer != null)
                     pt = _piServer.PIPoints[tagName];
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 // Todo: send to api IncidentUtil.PutIncident(IncidentKind.DeviceConnectionLoose, Task.ObjectId);
                 Logger.Error(ex);
@@ -259,11 +222,11 @@ namespace Service.Clients.PI {
 
         protected override bool GetConnectionState()
         {
-            try
-            {
+            try 
+                {
                 return _piServer != null ? _piServer.Connected : false;
-            }
-            catch (Exception e)
+            } 
+            catch (Exception e) 
             {
                 Logger.Error(e);
                 return false;

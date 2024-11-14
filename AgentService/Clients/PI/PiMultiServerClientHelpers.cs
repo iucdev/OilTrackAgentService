@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Text;
 
 namespace Service.Clients.PI {
     public class PiMultiServerClientHelpers {
@@ -20,6 +21,17 @@ namespace Service.Clients.PI {
 
         public static string ToSafeString(object val) {
             return val == null ? string.Empty : val.ToString().Replace("\0", string.Empty);
+        }
+
+        public static string ToSafeStringWithEncoding(object val, string sourceEncoding = "Windows-1251") {
+            if (val == null)
+                return string.Empty;
+            try {
+                string decodedString = Encoding.GetEncoding(sourceEncoding).GetString(Encoding.Default.GetBytes(val.ToString()));
+                return decodedString.Replace("\0", string.Empty);
+            } catch {
+                return val.ToString().Replace("\0", string.Empty);
+            }
         }
 
     }
