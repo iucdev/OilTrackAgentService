@@ -12,36 +12,23 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
-using System.Reflection.Emit;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
-using static Dapper.SqlMapper;
 
 namespace Service.Clients.DBO {
     public static class DboConnectionHelpers {
         private static TankTransferData ReadTransfersFromDb(this DbDataReader reader, ObjectSource objectSource, Logger logger)
         {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"StartDate {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.StartTime}"))}");
-            stringBuilder.AppendLine($"EndDate {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.EndTime}"))}");
-            stringBuilder.AppendLine($"MassStart {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.MassStart}"))}");
-            stringBuilder.AppendLine($"MassEnd {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.MassFinish}"))}");
-            stringBuilder.AppendLine($"LevelStart {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelStart}"))}");
-            stringBuilder.AppendLine($"LevelEnd {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelFinish}"))}");
-            stringBuilder.AppendLine($"VolumeStart {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeStart}"))}");
-            stringBuilder.AppendLine($"VolumeEnd {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeFinish}"))}");
+            
 
-            //logger.Debug(stringBuilder.ToString());
-
-            var startDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.StartTime}"));
-            var endDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.EndTime}"));
-            var massStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.MassStart}")), 3);
-            var massEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.MassFinish}")), 3);
-            var levelStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelStart}")), 3);
-            var levelEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelFinish}")), 3);
-            var volumeStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeStart}")), 3);
-            var volumeEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeFinish}")), 3);
+            var startDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.StartTime.Replace("D.", "")}"));
+            var endDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.EndTime.Replace("D.", "")}"));
+            var massStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.MassStart.Replace("D.", "")}")), 3);
+            var massEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.MassFinish.Replace("D.", "")}")), 3);
+            var levelStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelStart.Replace("D.", "")}")), 3);
+            var levelEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.LevelFinish.Replace("D.", "")}")), 3);
+            var volumeStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeStart.Replace("D.", "")}")), 3);
+            var volumeEnd = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.VolumeFinish.Replace("D.", "")}")), 3);
 
             var data = new TankTransferData
             {
@@ -53,7 +40,7 @@ namespace Service.Clients.DBO {
                 LevelEnd = levelEnd,
                 VolumeStart = volumeStart,
                 VolumeEnd = volumeEnd,
-                OilProductType = CommonHelper.TryGetOilProductType(reader.GetString(reader.GetOrdinal($"{objectSource.TankTransferParams.OilProductType}")), logger),
+                OilProductType = CommonHelper.TryGetOilProductType(reader.GetString(reader.GetOrdinal($"{objectSource.TankTransferParams.OilProductType.Replace("T.", "").Replace("\"", "")}")), logger),
                 LevelUnitType = objectSource.LevelUnitType.Value,
                 MassUnitType = objectSource.MassUnitType.Value,
                 VolumeUnitType = objectSource.VolumeUnitType.Value
@@ -66,23 +53,13 @@ namespace Service.Clients.DBO {
 
         private static TankMeasurementData ReadMeasurementFromDb(this DbDataReader reader, ObjectSource objectSource, Logger logger)
         {
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"tempType {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Temperature}"))}");
-            stringBuilder.AppendLine($"levelType {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Level}"))}");
-            stringBuilder.AppendLine($"volumeType {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Volume}"))}");
-            stringBuilder.AppendLine($"massType {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Mass}"))}");
-            stringBuilder.AppendLine($"measurementDateType {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankMeasurementParams.DateTimeStamp}"))}");
-            stringBuilder.AppendLine($"densityType {reader.GetFieldType(reader.GetOrdinal($"{objectSource.TankMeasurementParams.Density}"))}");
-
-            //logger.Debug(stringBuilder.ToString());
-
-            var temperature = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Temperature);
-            var level = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Level);
-            var volume = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Volume);
-            var mass = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Mass);
-            var measurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankMeasurementParams.DateTimeStamp}"));
-            var density = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Density);
-            var oilProductTypeOrdinal = reader.GetOrdinal($"{objectSource.TankMeasurementParams.OilProductType}");
+            var temperature = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Temperature.Replace("D.", ""));
+            var level = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Level.Replace("D.", ""));
+            var volume = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Volume.Replace("D.", ""));
+            var mass = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Mass.Replace("D.", ""));
+            var measurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankMeasurementParams.DateTimeStamp.Replace("D.", "")}"));
+            var density = tryGetDecimalFromTbField(reader, objectSource.TankMeasurementParams.Density.Replace("D.", ""));
+            var oilProductTypeOrdinal = reader.GetOrdinal($"{objectSource.TankMeasurementParams.OilProductType.Replace("T.", "").Replace("\"", "")}");
             var oilProductTypeRaw = !reader.IsDBNull(oilProductTypeOrdinal) ? reader.GetString(oilProductTypeOrdinal) : string.Empty;
             var data = new TankMeasurementData {
                 Temperature = temperature,
@@ -119,23 +96,57 @@ namespace Service.Clients.DBO {
 
         private static FlowmeterMeasurementData ReadFlowmeterMeasurementFromDb(this DbDataReader reader, ObjectSource objectSource, Logger logger)
         {
-            var totalMass = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.TotalMass}")), 3);
-            var flowMass = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.FlowMass}")), 3);
-            var totalVolume = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.TotalVolume}")), 3);
-            var currentDensity = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.CurrentDensity}")), 3);
-            var currentTemperature = reader.GetDecimal(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.CurrentTemperature}"));
-            var measurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.DateTimeStamp}"));
-            var oilProductTypeRaw = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OilProductType}"));
-            var opTypeRaw = reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OperationType}");
-            var sourceTankIdRaw = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.SourceTankId}"));
-            var renterXin = string.Empty;
+            var totalMass = tryGetDecimalFromTbField(reader, objectSource.FlowmeterIndicatorParams.TotalMass.Replace("D.", ""));
+            var flowMass = tryGetDecimalFromTbField(reader, objectSource.FlowmeterIndicatorParams.FlowMass.Replace("D.", ""));
+            var totalVolume = tryGetDecimalFromTbField(reader, objectSource.FlowmeterIndicatorParams.TotalVolume.Replace("D.", ""));
+            var currentDensity = tryGetDecimalFromTbField(reader, objectSource.FlowmeterIndicatorParams.CurrentDensity.Replace("D.", ""));
+            var currentTemperature = tryGetDecimalFromTbField(reader, objectSource.FlowmeterIndicatorParams.CurrentTemperature.Replace("D.", ""));
+            var measurementDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.DateTimeStamp.Replace("D.", "")}"));
+
+            var oilProductType = OilProductType.UNKNOWN;
             try {
-                renterXin = reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.RenterXin}").ToString();
-            } catch (Exception) {
+                var rawVal = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OilProductType.Replace("T.", "").Replace("\"", "")}"));
+                oilProductType = CommonHelper.TryGetOilProductType(rawVal, logger);
+            } catch (Exception e) {
+                logger.Error($"Не удалось получить значение OilProductType {e}");
+            }
+
+            var operationType = FlowmeterOperationType.Undefined;
+            if (!string.IsNullOrEmpty(objectSource.FlowmeterIndicatorParams.OperationType)) {
                 try {
-                    renterXin = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.RenterXin}"));
+                    var rawVal = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OperationType}"));
+                    operationType = Enum.TryParse<FlowmeterOperationType>(rawVal, out var parsedOpType)
+                        ? parsedOpType
+                        : FlowmeterOperationType.Undefined;
+                } catch (Exception) {
+                    try {
+                        operationType = (FlowmeterOperationType)reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.OperationType}");
+                    } catch (Exception e) {
+                        logger.Error($"Не удалось получить значение OperationType {e}");
+                    }
+                }
+            }
+
+            long sourceTankId = 0;
+            if (!string.IsNullOrEmpty(objectSource.FlowmeterIndicatorParams.SourceTankId)) {
+                try {
+                    var rawVal = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.SourceTankId}"));
+                    sourceTankId = CommonHelper.TryGetSourceTankId(rawVal, objectSource);
                 } catch (Exception e) {
-                    renterXin = "";
+                    logger.Error($"Не удалось получить значение SourceTankId {e}");
+                }
+            }
+
+            var renterXin = string.Empty;
+            if (!string.IsNullOrEmpty(objectSource.FlowmeterIndicatorParams.RenterXin)) {
+                try {
+                    renterXin = reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.RenterXin}").ToString();
+                } catch (Exception) {
+                    try {
+                        renterXin = reader.GetString(reader.GetOrdinal($"{objectSource.FlowmeterIndicatorParams.RenterXin}"));
+                    } catch (Exception e) {
+                        logger.Error($"Не удалось получить значение RenterXin {e}");
+                    }
                 }
             }
 
@@ -147,12 +158,10 @@ namespace Service.Clients.DBO {
                 CurrentTemperature = currentTemperature,
                 MeasurementDate = measurementDate,
                 MassUnitType = objectSource.MassUnitType.Value,
-                OilProductType = CommonHelper.TryGetOilProductType(oilProductTypeRaw, logger),
-                OperationType = Enum.TryParse<FlowmeterOperationType>(opTypeRaw.ToString(), out var parsedOpType) 
-                    ? parsedOpType
-                    : FlowmeterOperationType.Undefined,
-                SourceTankId = CommonHelper.TryGetSourceTankId(sourceTankIdRaw, objectSource),
                 VolumeUnitType = objectSource.VolumeUnitType.Value,
+                OilProductType = oilProductType,
+                OperationType = operationType,
+                SourceTankId = sourceTankId,
                 RenterXin = renterXin
             };
             return data;
@@ -171,7 +180,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -193,7 +206,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -220,7 +237,11 @@ namespace Service.Clients.DBO {
                         command.Parameters.Add(parameter);
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -242,7 +263,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadTransfersFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -268,7 +293,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -290,7 +319,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -317,7 +350,11 @@ namespace Service.Clients.DBO {
                         command.Parameters.Add(parameter);
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -339,7 +376,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -365,7 +406,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -387,7 +432,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -414,7 +463,11 @@ namespace Service.Clients.DBO {
                         command.Parameters.Add(parameter);
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -436,7 +489,11 @@ namespace Service.Clients.DBO {
                         command.CommandTimeout = cmdTimeout;
                         using (var reader = await command.ExecuteReaderAsync()) {
                             while (await reader.ReadAsync()) {
-                                list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                try {
+                                    list.Add(reader.ReadFlowmeterMeasurementFromDb(objectSource, logger));
+                                } catch {
+                                    continue;
+                                }
                             }
                         }
                     }
@@ -587,7 +644,7 @@ namespace Service.Clients.DBO {
 
         private static string GetFlowmeterQuery(ObjectSource source, string tableName, DboType dboType, Logger logger)
         {
-            var queryParams = $@"
+            var queryParams = new StringBuilder($@"
                     {source.FlowmeterIndicatorParams.TotalMass}, 
                     {source.FlowmeterIndicatorParams.FlowMass}, 
                     {source.FlowmeterIndicatorParams.TotalVolume}, 
@@ -595,16 +652,24 @@ namespace Service.Clients.DBO {
                     {source.FlowmeterIndicatorParams.CurrentTemperature},
                     {source.FlowmeterIndicatorParams.OilProductType},
                     {source.FlowmeterIndicatorParams.OperationType},
-                    {source.FlowmeterIndicatorParams.DateTimeStamp},
-                    {source.FlowmeterIndicatorParams.SourceTankId}";
+                    {source.FlowmeterIndicatorParams.DateTimeStamp}");
+
+            if (!string.IsNullOrEmpty(source.FlowmeterIndicatorParams.SourceTankId)) {
+                queryParams.Append($", {source.FlowmeterIndicatorParams.SourceTankId}");
+            }
+            
+            if (!string.IsNullOrEmpty(source.FlowmeterIndicatorParams.RenterXin)) {
+                queryParams.Append($", {source.FlowmeterIndicatorParams.RenterXin}");
+            }
+
             var lastSyncDate = LastSyncRecord.GetByExternalId(source.ExternalId.Value, logger).LastFlowmeterSyncDate;
             const int ps = 100;
 
             switch (dboType) {
-                case DboType.Default: return getDefaultFlowmeterSqlQuery(queryParams, source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, lastSyncDate, logger);
-                case DboType.MySql: return getMySqlFlowmeterQuery(queryParams, source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, lastSyncDate, logger);
-                case DboType.Oracle: return getOracleFlowmeterQuery(queryParams, source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, logger);
-                case DboType.FireBird: return getFireBirdFlowmeterQuery(queryParams, source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, lastSyncDate, logger);
+                case DboType.Default: return getDefaultFlowmeterSqlQuery(queryParams.ToString(), source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, lastSyncDate, logger);
+                case DboType.MySql: return getMySqlFlowmeterQuery(queryParams.ToString(), source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, lastSyncDate, logger);
+                case DboType.Oracle: return getOracleFlowmeterQuery(queryParams.ToString(), source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, logger);
+                case DboType.FireBird: return getFireBirdFlowmeterQuery(queryParams.ToString(), source.FlowmeterIndicatorParams.DateTimeStamp, tableName, source, ps, lastSyncDate, logger);
                 default: throw new NotImplementedException(dboType.ToString());
             }
         }
