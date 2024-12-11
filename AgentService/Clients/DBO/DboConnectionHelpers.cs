@@ -19,8 +19,6 @@ namespace Service.Clients.DBO {
     public static class DboConnectionHelpers {
         private static TankTransferData ReadTransfersFromDb(this DbDataReader reader, ObjectSource objectSource, Logger logger)
         {
-            
-
             var startDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.StartTime.Replace("D.", "")}"));
             var endDate = reader.GetDateTime(reader.GetOrdinal($"{objectSource.TankTransferParams.EndTime.Replace("D.", "")}"));
             var massStart = Math.Round(reader.GetDecimal(reader.GetOrdinal($"{objectSource.TankTransferParams.MassStart.Replace("D.", "")}")), 3);

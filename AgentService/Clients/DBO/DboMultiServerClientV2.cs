@@ -33,22 +33,26 @@ namespace Service.Clients.DBO {
                 var flowmeterMeasurements = new List<FlowmeterMeasurements>();
 
                 foreach (var source in ObjectSettings.Objects.First().ObjectSources) {
-                    if (source.TankMeasurementParams != null) {
-                        var measurementResult = GetAllMeasurementFieldsAsync(source).Result;
-                        Logger.Debug($"measurementResult return {measurementResult.Count()} items");
-                        tanksMeasurements.Add(
-                            new TankMeasurements() { TankId = source.ExternalId.Value, Measurements = measurementResult }
-                        );
-                    }
-                    if (source.TankTransferParams != null) {
-                        tanksTransfers.Add(
-                            new TankTransfers() { TankId = source.ExternalId.Value, Transfers = GetAllTransferFieldsAsync(source).Result }
-                        );
-                    }
-                    if (source.FlowmeterIndicatorParams != null) {
-                        flowmeterMeasurements.Add(
-                            new FlowmeterMeasurements() { FlowmeterId = source.ExternalId.Value, Measurements = GetAllFlowmeterFieldsAsync(source).Result }
-                        );
+                    try {
+                        if (source.TankMeasurementParams != null) {
+                            var measurementResult = GetAllMeasurementFieldsAsync(source).Result;
+                            Logger.Debug($"measurementResult return {measurementResult.Count()} items");
+                            tanksMeasurements.Add(
+                                new TankMeasurements() { TankId = source.ExternalId.Value, Measurements = measurementResult }
+                            );
+                        }
+                        if (source.TankTransferParams != null) {
+                            tanksTransfers.Add(
+                                new TankTransfers() { TankId = source.ExternalId.Value, Transfers = GetAllTransferFieldsAsync(source).Result }
+                            );
+                        }
+                        if (source.FlowmeterIndicatorParams != null) {
+                            flowmeterMeasurements.Add(
+                                new FlowmeterMeasurements() { FlowmeterId = source.ExternalId.Value, Measurements = GetAllFlowmeterFieldsAsync(source).Result }
+                            );
+                        }
+                    } catch (Exception ex) {
+                        Logger.Error($"Error while collecting data {source.InternalId}. Error: {ex}");
                     }
                 }
 
