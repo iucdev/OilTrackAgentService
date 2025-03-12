@@ -1,0 +1,138 @@
+{
+  "ShowDebugLogs": "true",
+  "ApiUrl": "Ссылка до Api, значение string",
+  "ApiToken": "Bearer токен от Api, значение string",
+  "ConnectionType": "Вид подключения к источнику данных, значение из справочинка ConnectionType",
+  "IpConnectionConfig": {
+    "IpAddress": "IP адрес, значение string",
+    "Port": "Порт, значение int",
+    "RSMDBConnectionString": "Строка подключения string RSMDB, значение string",
+    "DComUid": "DComUid, значение string",
+    "DComPwd": "DComPwd, значение string"
+  },
+  "ComConnectionConfig": {
+    "PortName": "Название порта, значение string",
+    "BaudRate": "Скорость чтения, значение int",
+    "DataBits": "Количество Data бит, значение int",
+    "Parity": "Четность, значение из enum Parity",
+    "StopBits": "Количество Stop бит, значение из enum StopBits",
+    "ReadTimeout": "Время ожидания чтения в мс, значение int",
+    "WriteTimeout": "Время ожидания записи в мс, значение int"
+  },
+  "DatabaseConnectionConfig": {
+    "ConnectionString": "Строка подключения к базе данных, значение string",
+    "DboType": "Вид базы данных, значение из enum DboType",
+    "MeasurementTable": "Наименование таблицы с данными разеревура, значение string",
+    "TransferTable": "Наименование таблицы с данными о трансферах резервуара, значение string",
+    "FlowmeterTable": "Наименование таблицы с данными расходомера, значение string"
+  },
+  "ClientType": "Вид клиента, значение из enum ClientType",
+  "Objects": [
+    {
+      "ObjectId": "ИД объекта в системе OilTrack, значение long",
+      "ObjectSources": [
+        {
+          "InternalId": "ИД/наименование резервуара в локали, значение string",
+          "ExternalId": "ИД резервуара в системе OilTrack, значение long",
+          "OilProductType": "Вид нефтепродукта, значение из enum OilProductType",
+          "VolumeUnitType": "Единица измерения объема НП, значение из enum VolumeUnitType",
+          "MassUnitType": "Единица измерения массы НП, значение из enum MassUnitType",
+          "LevelUnitType": "Единица измерения уровня НП, значение из enum LevelUnitType",
+          // значения ниже заполняются, если источник данных OPC или DBO, иначе можно удалить
+          "TankMeasurementParams": {
+            "Temperature": "Тег OPC/Наименование поля в таблице Температура, значение string",
+            "Density": "Тег OPC/Наименование поля в таблице Плотность, значение string",
+            "Volume": "Тег OPC/Наименование поля в таблице Объем, значение string",
+            "Mass": "Тег OPC/Наименование поля в таблице Масса, значение string",
+            "Level": "Тег OPC/Наименование поля в таблице Уровень, значение string",
+            "DateTimeStamp": "Тег OPC/Наименование поля в таблице Дата измерения, значение string",
+            "OilProductType": "Тег OPC/Наименование поля в таблице Вид нефтепродукта, значение string"
+          },
+          "TankTransferParams": {
+            "StartTime": "Тег OPC/Наименование поля в таблице Дата начала операции, значение string",
+            "EndTime": "Тег OPC/Наименование поля в таблице Дата конца операции, значение string",
+            "MassStart": "Тег OPC/Наименование поля в таблице Масса на начало операции, значение string",
+            "MassFinish": "Тег OPC/Наименование поля в таблице Масса на конец операции, значение string",
+            "LevelStart": "Тег OPC/Наименование поля в таблице Уровень на начало операции, значение string",
+            "LevelFinish": "Тег OPC/Наименование поля в таблице Уровень на конец операции, значение string",
+            "VolumeStart": "Тег OPC/Наименование поля в таблице Объем на начало операции, значение string",
+            "VolumeFinish": "Тег OPC/Наименование поля в таблице Объем на конец операции, значение string",
+            "OilProductType": "Тег OPC/Наименование поля в таблице Вид нефтепродукта, значение string"
+          },
+          "FlowmeterIndicatorParams": {
+            "TotalMass": "Тег OPC/Наименование поля в таблице Суммарная масса, значение string",
+            "FlowMass": "Тег OPC/Наименование поля в таблице Мгновенная масса, значение string",
+            "TotalVolume": "Тег OPC/Наименование поля в таблице Суммарный объем, значение string",
+            "CurrentDensity": "Тег OPC/Наименование поля в таблице Текущая плотность, значение string",
+            "CurrentTemperature": "Тег OPC/Наименование поля в таблице Текущая температура, значение string",
+            "DateTimeStamp": "Тег OPC/Наименование поля в таблице Дата и время измерения, значение string",
+            "OilProductType": "Тег OPC/Наименование поля в таблице Вид нефтепродукта, значение string",
+            "SourceTankId": "Тег OPC/Наименование поля в таблице Внутренний ИД резервуара-источника, значение string",
+            "OperationType": "Тег OPC/Наименование поля в таблице Вид операции, значение string"
+          },
+          "TransferCondition": "Условие выборки из таблицы данных трансферов, значение string",
+          "MeasurementCondition": "Условие выборки из таблицы данных резервуаров, значение string",
+          "FlowmeterCondition": "Условие выборки из таблицы данных расходомеров, значение string"
+        }
+      ]
+    }
+  ],
+  "StartFrom": "2024-05-05",
+  // необходимо заполнить маппинг по виду нефтепродукта ниже, если источник данных OPC или DBO, иначе можно удалить
+  "OilProductTypeMapping": {
+    "MYAI76": "AI76",
+    "MYAI91": "AI76",
+    "MYAI92": "AI76",
+    "MYAI92K5": "AI76",
+    "MYAI95": "AI76",
+    "MYAI95K5": "AI76",
+    "MYAI95PRIME": "AI76",
+    "MYAI96": "AI76",
+    "MYAI98": "AI76",
+    "MYAI98K5": "AI76",
+    "MYAI98PRIME": "AI76",
+    "MYG100": "AI76",
+    "MYDTZ": "AI76",
+    "MYDTZK4": "AI76",
+    "MYDTZPRIME": "AI76",
+    "MYDTLK4": "AI76",
+    "MYDTLPRIME": "AI76",
+    "MYDTAK2": "AI76",
+    "MYDTAK5": "AI76",
+    "MYDTEK2": "AI76",
+    "MYDTEK5": "AI76",
+    "MYDTM": "AI76",
+    "MYZM40": "AI76",
+    "MYTS1": "AI76",
+    "MYPTB": "AI76",
+    "MYNPD": "AI76",
+    "MYUNKNOWN": "AI76",
+    "MYAI80": "AI76",
+    "MYAI93": "AI76",
+    "MYAI92K4": "AI76",
+    "MYAI92PRIME": "AI76",
+    "MYAI95K4": "AI76",
+    "MYAI95PREMIUM": "AI76",
+    "MYG95": "AI76",
+    "MYAI96K4": "AI76",
+    "MYAI98K4": "AI76",
+    "MYAI98SUPER": "AI76",
+    "MYAI100": "AI76",
+    "MYDT": "AI76",
+    "MYDTZK2": "AI76",
+    "MYDTZK5": "AI76",
+    "MYDTL": "AI76",
+    "MYDTLK5": "AI76",
+    "MYDTA": "AI76",
+    "MYDTAK4": "AI76",
+    "MYDTE": "AI76",
+    "MYDTEK4": "AI76",
+    "MYDTXP": "AI76",
+    "MYM100": "AI76",
+    "MYZM100": "AI76",
+    "MYJETFUEL": "AI76",
+    "MYHYDRAZINE": "AI76",
+    "MYDISTILLYAT": "AI76",
+    "MYNEFRAS": "AI76"
+  }
+}

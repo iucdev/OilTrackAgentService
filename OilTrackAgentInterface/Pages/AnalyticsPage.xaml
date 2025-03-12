@@ -1,0 +1,91 @@
+﻿<Page x:Class="OilTrackAgentInterface.Pages.AnalyticsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:OilTrackAgentInterface.Pages"
+      xmlns:references="clr-namespace:OilTrackAgentInterface.Visibility"
+      Title="Analytics" 
+      mc:Ignorable="d" 
+      d:DesignHeight="833" d:DesignWidth="1224">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Добавляем прокрутку -->
+        <ScrollViewer VerticalScrollBarVisibility="Hidden" Grid.Row="0">
+            <ItemsControl ItemsSource="{Binding GroupedTankData.PagedItems}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Width="Auto" HorizontalAlignment="Center"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="Gray" BorderThickness="1" Padding="10" Margin="10" Background="#2A2A2A"
+                        CornerRadius="5" Width="190">
+                            <StackPanel>
+                                <!-- Название АЗС -->
+                                <TextBlock Text="{Binding StationName}" FontWeight="Bold" Foreground="White" FontSize="14" TextWrapping="Wrap" HorizontalAlignment="Center"/>
+
+                                <!-- Количество резервуаров -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+                                    <TextBlock Text="🛢️ Количество резервуаров: " Foreground="White"/>
+                                    <TextBlock Text="{Binding TotalTanks}" FontWeight="Bold" Foreground="White"/>
+                                </StackPanel>
+
+                                <!-- Статусы резервуаров -->
+                                <StackPanel Orientation="Horizontal" Margin="0,5,0,0" HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                                        <Ellipse Width="15" Height="15" Fill="Green" />
+                                        <TextBlock Text="{Binding GreenTanksCount}" Foreground="White" FontWeight="Bold" Margin="5,0,0,0"/>
+                                    </StackPanel>
+
+                                    <!--<StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                                        <Ellipse Width="15" Height="15" Fill="Yellow" />
+                                        <TextBlock Text="{Binding YellowTanksCount}" Foreground="White" FontWeight="Bold" Margin="5,0,0,0"/>
+                                    </StackPanel>-->
+
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Ellipse Width="15" Height="15" Fill="Red" />
+                                        <TextBlock Text="{Binding RedTanksCount}" Foreground="White" FontWeight="Bold" Margin="5,0,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+
+        <!-- Легенда -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Bottom" Grid.Row="1" Margin="10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                    <RowDefinition Height="20"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Ellipse Width="15" Height="15" Fill="Green" Grid.Row="0" Grid.Column="0" />
+                <TextBlock Text="Передает в течение 2 часов" Foreground="White" FontSize="12" Grid.Row="0" Grid.Column="1" Margin="5,0,0,0"/>
+
+                <!--<Ellipse Width="15" Height="15" Fill="Yellow" Grid.Row="1" Grid.Column="0" />
+                <TextBlock Text="Не передает в течение 5 часов" Foreground="White" FontSize="12" Grid.Row="1" Grid.Column="1" Margin="5,0,0,0"/>-->
+
+                <Ellipse Width="15" Height="15" Fill="Red" Grid.Row="1" Grid.Column="0" />
+                <TextBlock Text="Не передает в более 5 часов" Foreground="White" FontSize="12" Grid.Row="1" Grid.Column="1" Margin="5,0,0,0"/>
+            </Grid>
+        </StackPanel>
+
+    </Grid>
+</Page>
