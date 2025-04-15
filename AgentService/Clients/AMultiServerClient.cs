@@ -1,4 +1,4 @@
-﻿using Service.Clients.Scheduler;
+using Service.Clients.Scheduler;
 using Service.Clients.Utils;
 using Service.Enums;
 using NLog;
@@ -174,26 +174,55 @@ namespace Service.Clients.Client {
             response = string.Empty;
             if (!ObjectSettings.Mock) {
                 try {
-                    using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
-                        var endPoint = new IPEndPoint(IPAddress.Parse(ObjectSettings.IpConnectionConfig.IpAddress), ObjectSettings.IpConnectionConfig.Port ?? 0);
-                        socket.Connect(endPoint);
-                        Logger.Info($"Подключено к {endPoint}");
+                    if (ObjectSettings.ConnectionType == ConnectionType.Ip) {
+                        using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
+                            var endPoint = new IPEndPoint(IPAddress.Parse(ObjectSettings.IpConnectionConfig.IpAddress), ObjectSettings.IpConnectionConfig.Port ?? 0);
+                            socket.Connect(endPoint);
+                            Logger.Info($"Подключено к {endPoint}");
 
-                        byte[] commandBytes = Encoding.ASCII.GetBytes(command);
-                        socket.Send(commandBytes);
-                        Logger.Info("Команда отправлена.");
+                            byte[] commandBytes = Encoding.ASCII.GetBytes(command);
+                            socket.Send(commandBytes);
+                            Logger.Info("Команда отправлена.");
 
-                        Thread.Sleep(2000);
+                            Thread.Sleep(2000);
 
-                        byte[] responseBuffer = new byte[2048];
-                        int bytesReceived = socket.Receive(responseBuffer);
-                        if (bytesReceived > 0) {
-                            Logger.Debug($"bytesReceived: {bytesReceived}");
-                            response = Encoding.ASCII.GetString(responseBuffer, 0, bytesReceived);
-                            Logger.Info($"Ответ получен ({bytesReceived} байт): {response}");
-                            return true;
-                        } else {
-                            Logger.Warn("Ответ пуст.");
+                            byte[] responseBuffer = new byte[2048];
+                            int bytesReceived = socket.Receive(responseBuffer);
+                            if (bytesReceived > 0) {
+                                Logger.Debug($"bytesReceived: {bytesReceived}");
+                                response = Encoding.ASCII.GetString(responseBuffer, 0, bytesReceived);
+                                Logger.Info($"Ответ получен ({bytesReceived} байт): {response}");
+                                return true;
+                            } else {
+                                Logger.Warn("Ответ пуст.");
+                                return false;
+                            }
+                        }
+                    } else {
+                        if (_sPort == null || !_sPort.IsOpen) {
+                            Logger.Error("COM-порт не открыт. Повторное подключение...");
+                            if (!ConnectCom()) return false;
+                        }
+
+                        try {
+                            byte[] commandBytes = Encoding.ASCII.GetBytes(command);
+                            _sPort.Write(commandBytes, 0, commandBytes.Length);
+                            Logger.Info("Команда отправлена.");
+
+                            response = ReadFullResponse(_sPort, 5000); // ожидание до ETX
+
+                            if (!string.IsNullOrEmpty(response)) {
+                                Logger.Info($"Ответ получен ({response.Length} байт): {response}");
+                                return true;
+                            } else {
+                                Logger.Warn("Ответ пуст или не получен до таймаута.");
+                                return false;
+                            }
+                        } catch (TimeoutException tex) {
+                            Logger.Warn("Таймаут при получении ответа: " + tex.Message);
+                            return false;
+                        } catch (Exception ex) {
+                            Logger.Error("Ошибка при работе с COM-портом: " + ex.Message);
                             return false;
                         }
                     }
@@ -204,6 +233,33 @@ namespace Service.Clients.Client {
             }
 
             return true;
+        }
+
+        private string ReadFullResponse(SerialPort port, int timeoutMilliseconds = 5000) {
+            var buffer = new StringBuilder();
+            var startTime = DateTime.Now;
+
+            while ((DateTime.Now - startTime).TotalMilliseconds < timeoutMilliseconds) {
+                try {
+                    if (port.BytesToRead > 0) {
+                        int readByte = port.ReadByte();
+                        if (readByte == -1)
+                            continue;
+
+                        char ch = (char)readByte;
+                        buffer.Append(ch);
+
+                        if (ch == '\x03') // ETX — конец сообщения
+                            break;
+                    } else {
+                        Thread.Sleep(50); // пауза перед повторной проверкой
+                    }
+                } catch (TimeoutException) {
+                    break;
+                }
+            }
+
+            return buffer.ToString();
         }
     }
 
