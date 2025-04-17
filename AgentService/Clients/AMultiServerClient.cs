@@ -175,28 +175,27 @@ namespace Service.Clients.Client {
             if (!ObjectSettings.Mock) {
                 try {
                     if (ObjectSettings.ConnectionType == ConnectionType.Ip) {
-                        using (var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)) {
-                            var endPoint = new IPEndPoint(IPAddress.Parse(ObjectSettings.IpConnectionConfig.IpAddress), ObjectSettings.IpConnectionConfig.Port ?? 0);
-                            socket.Connect(endPoint);
-                            Logger.Info($"Подключено к {endPoint}");
-
-                            byte[] commandBytes = Encoding.ASCII.GetBytes(command);
-                            socket.Send(commandBytes);
-                            Logger.Info("Команда отправлена.");
-
-                            Thread.Sleep(2000);
-
-                            byte[] responseBuffer = new byte[2048];
-                            int bytesReceived = socket.Receive(responseBuffer);
-                            if (bytesReceived > 0) {
-                                Logger.Debug($"bytesReceived: {bytesReceived}");
-                                response = Encoding.ASCII.GetString(responseBuffer, 0, bytesReceived);
-                                Logger.Info($"Ответ получен ({bytesReceived} байт): {response}");
-                                return true;
-                            } else {
-                                Logger.Warn("Ответ пуст.");
-                                return false;
-                            }
+                        if (_socket == null || !_socket.Connected || !SocketExtensions.IsConnected(_socket)) {
+                            Logger.Warn("IP-сокет не подключён. Повторное подключение...");
+                            if (!ConnectIp()) return false;
+                        }
+                    
+                        byte[] commandBytes = Encoding.ASCII.GetBytes(command);
+                        _socket.Send(commandBytes);
+                        Logger.Info("Команда отправлена.");
+                    
+                        Thread.Sleep(2000);
+                    
+                        byte[] responseBuffer = new byte[2048];
+                        int bytesReceived = _socket.Receive(responseBuffer);
+                        if (bytesReceived > 0) {
+                            Logger.Debug($"bytesReceived: {bytesReceived}");
+                            response = Encoding.ASCII.GetString(responseBuffer, 0, bytesReceived);
+                            Logger.Info($"Ответ получен ({bytesReceived} байт): {response}");
+                            return true;
+                        } else {
+                            Logger.Warn("Ответ пуст.");
+                            return false;
                         }
                     } else {
                         if (_sPort == null || !_sPort.IsOpen) {
