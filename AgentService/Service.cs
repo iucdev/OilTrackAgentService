@@ -8,7 +8,7 @@ using NLog;
 namespace AgentService {
     public partial class Service : ServiceBase
     {
-        private static readonly Logger Logger = LogManager.GetLogger(typeof(Service).Name);
+        private static readonly Logger Logger = LogManager.GetLogger("Sender");
         private static bool isPowerEvent = true;
 
         public Service()
