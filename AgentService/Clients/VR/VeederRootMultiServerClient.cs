@@ -53,14 +53,15 @@ namespace Service.Clients.VR {
                         }
 
                         Thread.Sleep(500);
-                        Logger.Debug($"End Collecting Tank Measurements Tank Number {source.InternalId}");
+                        Logger.Debug($"End Collecting Tank Measurements Tank Number {source.InternalId} (i231)");
                         Logger.Debug("-------------------------------------------------------------------------------------------");
                         var transfers = Send215(source);
                         if (transfers != null) {
                             tanksTransfers.Add(transfers);
                         }
-                        Logger.Debug($"End Collecting Tank Transfer Tank Number {source.InternalId}");
+                        Logger.Debug($"End Collecting Tank Transfer Tank Number {source.InternalId} (i215)");
                         Logger.Debug("-------------------------------------------------------------------------------------------");
+                        Thread.Sleep(500);
                     }
                 } catch (Exception ex) {
                     Logger.Error($"Ошибка при сборе данных: {ex}");
@@ -69,6 +70,8 @@ namespace Service.Clients.VR {
 
             QueueTaskService.Instance.SaveMeasurementsAsTask(tanksMeasurements.ToArray());
             QueueTaskService.Instance.SaveTransfersAsTask(tanksTransfers.ToArray());
+            StopCollection();
+            Logger.Debug($"Closing connection after collecting data");
         }
 
         protected TankMeasurements Send231(ObjectSource objectSource, string password = null) {
@@ -118,7 +121,7 @@ namespace Service.Clients.VR {
             response = response.Split(new[] { "&&" }, StringSplitOptions.None)[0];
             // Removing command 'i231TT'
             var command = response.Substring(0, 7);
-            Logger.Debug($"Command: {command}");
+            Logger.Debug($"Command: {command} (Excpecting 231)");
             response = response.Substring(7);
 
             var tankMeasurementDataList = new List<TankMeasurementData>();
@@ -276,7 +279,7 @@ namespace Service.Clients.VR {
             response = response.Split(new[] { "&&" }, StringSplitOptions.None)[0];
             // Removing command 'i215TT'
             var command = response.Substring(0, 7);
-            Logger.Debug($"Command: {command}");
+            Logger.Debug($"Command: {command} (Excpecting 215)");
             response = response.Substring(7);
 
             var transferDataList = new List<TankTransferData>();

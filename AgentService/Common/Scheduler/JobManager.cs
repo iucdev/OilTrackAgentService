@@ -10,7 +10,7 @@ using System.Threading;
 namespace Service.Clients.Scheduler {
     public class JobManager {
         private static JobManager _jobInstance = null;
-        private Logger log = LogManager.GetLogger(typeof(JobManager).Name);
+        private Logger log = LogManager.GetLogger("Sender");
 
         private List<BackgroundWorker> _workers = null;
 

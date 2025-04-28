@@ -36,6 +36,9 @@ namespace OilTrackAgentInterface.ViewModel {
                 case "SendPackage":
                     _mainFrame.Navigate(new Pages.SendPackage());
                     break;
+                case "Logs":
+                    _mainFrame.Navigate(new Pages.LogViewerPage());
+                    break;
                 default:
                     throw new ArgumentException($"Unknown view name: {viewName}");
             }

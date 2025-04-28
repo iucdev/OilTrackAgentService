@@ -11,6 +11,7 @@ using System.Collections.ObjectModel;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 
@@ -19,7 +20,7 @@ namespace Service.LocalDb {
         private static readonly string _currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static readonly string ConnectionString = $"Data Source={_currentDirectory}database.db;Version=3;";
         private static readonly Logger _logger = LogManager.GetCurrentClassLogger();
-
+        private static SunpApiClient _sunpApiClient = SunpApiClientSingleton.Instance.SunpApiClient;
         public static void InitializeDatabase() {
             try {
                 using (var connection = new SQLiteConnection(DatabaseManager.ConnectionString)) {
@@ -108,15 +109,45 @@ namespace Service.LocalDb {
                 foreach (var item in items) {
                     var internalTankId = objectSettings.ObjectSources.FirstOrDefault(t => t.ExternalId == item.TankId).InternalId;
                     foreach (var indicator in item.Measurements) {
-                        TankIndicators.Add(new TankIndicatorRecord {
+                        TankIndicators.Add(new TankIndicatorRecord(internalTankId, item.TankId, indicator) {
                             InternalTankId = internalTankId,
-                            TankIndicators = indicator
+                            ExternalTankId = item.TankId,
+                            TankIndicators = indicator,
                         });
                     }
                 }
             }
 
             return TankIndicators;
+        }
+
+        public static async Task<CollectedApplicantData> GetApplicantDataAsync() {
+            var request = new RequestBodyBase() {
+                RequestGuid = Guid.NewGuid().ToString()
+            };
+
+            Debug.WriteLine($"🛠️ Проверяем _sunpApiClient: {_sunpApiClient != null}");
+            Debug.WriteLine($"🛠️ Базовый URL клиента: {_sunpApiClient?.BaseUrl}");
+            Debug.WriteLine($"🚀 Отправка запроса: {ObjectSettingsSingleton.Instance.ObjectSettings.ApiUrl}");
+            Debug.WriteLine($"🛠️ Токен: {ObjectSettingsSingleton.Instance.ObjectSettings.ApiToken}");
+            Debug.WriteLine($"📌 RequestGuid: {request.RequestGuid}");
+
+            if (_sunpApiClient == null) {
+                Debug.WriteLine("⚠️ _sunpApiClient не инициализирован. Повторная попытка...");
+                SunpApiClientSingleton.Instance.InitializeClient();
+                _sunpApiClient = SunpApiClientSingleton.Instance.SunpApiClient;
+            }
+
+            try {
+                var data = await _sunpApiClient.ProviderGetApplicantDataAsync(request);
+                Debug.WriteLine("✅ Запрос успешно выполнен!");
+                return data.ApplicantData;
+            } catch (HttpRequestException httpEx) {
+                Debug.WriteLine($"❌ Ошибка HTTP: {httpEx.Message}");
+            } catch (Exception ex) {
+                Debug.WriteLine($"💥 Общая ошибка: {ex.Message}");
+            }
+            return null;
         }
 
         public static async Task<List<TankTransferRecord>> LoadTankTransfersDataAsync() {
@@ -172,7 +203,9 @@ SELECT
 {nameof(QueueTaskRecord.Status)}, 
 {nameof(QueueTaskRecord.Items)}, 
 {nameof(QueueTaskRecord.Error)}
-FROM {nameof(QueueTaskRecord)}";
+FROM {nameof(QueueTaskRecord)}
+WHERE {nameof(QueueTaskRecord.Items)} not like '%""volume"":0%'
+ORDER BY {nameof(QueueTaskRecord.CreateDate)} DESC LIMIT 1000";
                 using (var command = new SQLiteCommand(commandQuery, connection)) {
                     using (var reader = await command.ExecuteReaderAsync()) {
                         while (await reader.ReadAsync()) {

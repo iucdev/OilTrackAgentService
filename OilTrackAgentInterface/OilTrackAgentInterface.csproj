@@ -126,8 +126,28 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Controls\LogTypeSwitcherControl.xaml.cs">
+      <DependentUpon>LogTypeSwitcherControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TankStatusCardControl.xaml.cs">
+      <DependentUpon>TankStatusCardControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ToastNotificationWindow.xaml.cs">
+      <DependentUpon>ToastNotificationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Models\LogEntry.cs" />
+    <Compile Include="Models\LogLevel.cs" />
     <Compile Include="Pages\Common\BasePage.cs" />
+    <Compile Include="Controls\TankDisplayControl.xaml.cs">
+      <DependentUpon>TankDisplayControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\LogViewerPage.xaml.cs">
+      <DependentUpon>LogViewerPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="ViewModel\AutoRefreshViewModel.cs" />
+    <Compile Include="ViewModel\LogFileItem.cs" />
+    <Compile Include="ViewModel\LogViewerViewModel.cs" />
     <Compile Include="ViewModel\PagedCollection.cs" />
     <Compile Include="ViewModel\PagedViewModel.cs" />
     <Compile Include="RelayCommand.cs" />
@@ -138,13 +158,31 @@
     <Compile Include="ViewModel\SideMenuViewModel.cs" />
     <Compile Include="ViewModel\TankIndicatorViewModel.cs" />
     <Compile Include="ViewModel\TankTransfersViewModel.cs" />
+    <Compile Include="Visibility\BoolInverseToVisibilityConverter.cs" />
+    <Compile Include="Visibility\BoolToWatchingTextConverter.cs" />
     <Compile Include="Visibility\ClientTypeToVisibilityConverter.cs" />
     <Compile Include="Visibility\ConnectionTypeToVisibilityConverter.cs" />
+    <Compile Include="Visibility\LevelToBrushConverter.cs" />
     <Compile Include="Visibility\LevelUnitTypeToDisplayTextConverter.cs" />
     <Compile Include="Visibility\MassUnitTypeToDisplayTextConverter.cs" />
+    <Compile Include="Visibility\PercentToBrushConverter.cs" />
+    <Compile Include="Visibility\PercentToScaleConverter.cs" />
+    <Compile Include="Visibility\ProgressWidthConverter.cs" />
     <Compile Include="Visibility\QueueTaskStatusToImageConverter.cs" />
     <Compile Include="Visibility\SortIconConverter.cs" />
     <Compile Include="Visibility\VolumeUnitTypeToDisplayTextConverter.cs" />
+    <Page Include="Controls\LogTypeSwitcherControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TankStatusCardControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ToastNotificationWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -161,6 +199,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Pages\LogViewerPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\SendPackage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -172,6 +214,10 @@
     <Page Include="Pages\TankTransfersPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Controls\TankDisplayControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

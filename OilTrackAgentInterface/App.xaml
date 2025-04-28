@@ -3,4 +3,42 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:OilTrackAgentInterface"
              StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <!-- Теперь этот стиль доступен из любого UserControl -->
+        <Style x:Key="SwitchToggleStyle" TargetType="ToggleButton">
+            <!-- Стиль «switch» переключателя -->
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="SnapsToDevicePixels" Value="True"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Grid>
+                            <Border x:Name="SwitchTrack"
+            CornerRadius="12"
+            Background="#555"/>
+                            <Ellipse x:Name="SwitchThumb"
+            Width="20" Height="20"
+            Fill="White"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="SwitchTrack" Property="Background" Value="#555"/>
+                                <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Left"/>
+                                <Setter TargetName="SwitchThumb" Property="Margin" Value="2,2,0,2"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="SwitchTrack" Property="Background" Value="#048204"/>
+                                <Setter TargetName="SwitchThumb" Property="HorizontalAlignment" Value="Right"/>
+                                <Setter TargetName="SwitchThumb" Property="Margin" Value="0,2,2,2"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="SwitchThumb" Property="Fill" Value="#EEE"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Application.Resources>
 </Application>

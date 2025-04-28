@@ -8,9 +8,28 @@ using System.Threading.Tasks;
 
 namespace AgentService.Models {
     public class TankIndicatorRecord {
+        public TankIndicatorRecord(string internalTankId, long externalTankId, Measurement tankIndicators) {
+            InternalTankId = internalTankId;
+            ExternalTankId = externalTankId;
+            TankIndicators = tankIndicators;
+        }
+
         public string InternalTankId { get; set; }
+        public long ExternalTankId { get; set; }
         public Measurement TankIndicators { get; set; }
     }
+
+    public class TankStatusCardViewModel {
+        public string InternalTankId { get; set; }
+        public string OilProductTypeText { get; set; }
+        public int LevelPercent { get; set; }
+        public string StatusText { get; set; } = "Активный";
+        public string StatusColor { get; set; } = "#4CAF50";
+        public double CurrentVolume { get; set; }
+        public double MaxVolume { get; set; }
+        public string UnitText { get; set; } = "дм³";
+    }
+
 
     public class TankIndicator {
         public long TankId { get; set; }

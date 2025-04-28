@@ -64,15 +64,16 @@ namespace OilTrackAgentInterface.ViewModel {
         /// </summary>
         private async Task<List<TankConnectionRecord>> LoadTankDataAsync() {
             try {
-                var data = await GetApplicantDataAsync();
+                var data = await DatabaseManager.GetApplicantDataAsync();
                 if(data == null) {
                     Debug.WriteLine($"Ошибка загрузки данных. Null");
                     return new List<TankConnectionRecord>();
                 }
                 var groupedData = data.Objects
+                    .Where(t => t.ObjectStatus == "Активный")
                     .Select(objectData => new TankConnectionRecord(
                         objectData.ObjectName,
-                        objectData.Tanks.Select(tankData => new TankData {
+                        objectData.Tanks.Where(t => t.TankStatus == "Активный").Select(tankData => new TankData {
                             LastConnectionTime = tankData.LastConnectionTime,
                             Status = GetTankStatus(tankData.LastConnectionTime)
                         }).ToList()
@@ -83,35 +84,6 @@ namespace OilTrackAgentInterface.ViewModel {
                 Debug.WriteLine($"Ошибка загрузки данных: {ex.Message}");
                 return new List<TankConnectionRecord>(); // Возвращаем пустой список при ошибке
             }
-        }
-
-        private async Task<CollectedApplicantData> GetApplicantDataAsync() {
-            var request = new RequestBodyBase() {
-                RequestGuid = Guid.NewGuid().ToString()
-            };
-
-            Debug.WriteLine($"🛠️ Проверяем _sunpApiClient: {_sunpApiClient != null}");
-            Debug.WriteLine($"🛠️ Базовый URL клиента: {_sunpApiClient?.BaseUrl}");
-            Debug.WriteLine($"🚀 Отправка запроса: {ObjectSettingsSingleton.Instance.ObjectSettings.ApiUrl}");
-            Debug.WriteLine($"🛠️ Токен: {ObjectSettingsSingleton.Instance.ObjectSettings.ApiToken}");
-            Debug.WriteLine($"📌 RequestGuid: {request.RequestGuid}");
-
-            if (_sunpApiClient == null) {
-                Debug.WriteLine("⚠️ _sunpApiClient не инициализирован. Повторная попытка...");
-                SunpApiClientSingleton.Instance.InitializeClient();
-                _sunpApiClient = SunpApiClientSingleton.Instance.SunpApiClient;
-            }
-
-            try {
-                var data = await _sunpApiClient.ProviderGetApplicantDataAsync(request);
-                Debug.WriteLine("✅ Запрос успешно выполнен!");
-                return data.ApplicantData;
-            } catch (HttpRequestException httpEx) {
-                Debug.WriteLine($"❌ Ошибка HTTP: {httpEx.Message}");
-            } catch (Exception ex) {
-                Debug.WriteLine($"💥 Общая ошибка: {ex.Message}");
-            }
-            return null;
         }
 
         /// <summary>

@@ -6,7 +6,7 @@ namespace Service.Clients.Scheduler
 {
     public abstract class Job
     {
-        internal Logger Log = LogManager.GetLogger(typeof(Job).Name);
+        internal Logger Log = LogManager.GetLogger("Sender");
 
         public abstract NamedBackgroundWorker RunWorker();
 

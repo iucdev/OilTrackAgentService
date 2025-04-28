@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="OilTrackAgentInterface.Controls.TankStatusCardControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:OilTrackAgentInterface.Visibility"
+             Width="300" Height="190">
+    <UserControl.Resources>
+        <!-- Цвет заливки в зависимости от процента -->
+        <conv:PercentToBrushConverter x:Key="PctToBrush" />
+        <!-- Конвертер процента в масштаб по высоте -->
+        <conv:PercentToScaleConverter x:Key="PctToScale" />
+    </UserControl.Resources>
+    <Border Background="#1c1c21" CornerRadius="8" Padding="16,16, 0,0" Height="190">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Вертикальный резервуар -->
+                <Grid Grid.Column="0" Width="45" Height="150" Margin="10, 0, 0, 15">
+                    <!-- Контур резервуара -->
+                    <Border CornerRadius="14" BorderThickness="0.6" BorderBrush="Black" Background="Transparent" Width="45">
+                        <Border CornerRadius="14" BorderThickness="4" BorderBrush="#2c2d32" Background="Transparent" Width="42" />
+                    </Border>
+                    <!-- Заливка, высота меняется пропорционально LevelPercent -->
+                    <Rectangle Fill="{Binding LevelPercent, Converter={StaticResource PctToBrush}}"
+                               VerticalAlignment="Bottom"
+                               Margin="6"
+                               RadiusX="11" RadiusY="9">
+                        <Rectangle.Height>
+                            <Binding Path="LevelPercent"
+                                     Converter="{StaticResource PctToScale}"
+                                     ConverterParameter="140" />
+                        </Rectangle.Height>
+                    </Rectangle>
+                </Grid>
+
+                <!-- Текстовая часть -->
+                <StackPanel Grid.Column="2" Margin="16">
+                    <!-- Процент и бейдж -->
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock FontSize="34" FontWeight="Bold" Foreground="White"
+               Text="{Binding LevelPercent, StringFormat={}{0}%}"/>
+                        <Border Background="{Binding StatusColor}" CornerRadius="4" Padding="4,2" Margin="16" VerticalAlignment="Top">
+                            <TextBlock Text="{Binding StatusText}" FontSize="12" Foreground="White" />
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Подписи -->
+                    <TextBlock FontSize="15" Foreground="White" Margin="0,10,0,0">
+                        <Run Text="Наименование: " FontWeight="SemiBold" />
+                        <Run Text="{Binding InternalTankId}" FontWeight="Normal" />
+                        <Run Text="{Binding OilProductTypeText, StringFormat={}({0})}" FontWeight="Normal" />
+                    </TextBlock>
+
+                    <!-- Объём -->
+                    <TextBlock HorizontalAlignment="Left" FontSize="14" Foreground="#666" Margin="0,10,0,0">
+                        <Run Text="{Binding CurrentVolume, StringFormat={}{0:N0}}" />
+                        <Run Text="/" />
+                        <Run Text="{Binding MaxVolume, StringFormat={}{0:N0}}" />
+                        <Run Text=" " />
+                        <Run Text="{Binding UnitText}" />
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+</UserControl>

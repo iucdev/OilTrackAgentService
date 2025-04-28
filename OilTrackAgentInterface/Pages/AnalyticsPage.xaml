@@ -27,7 +27,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border BorderBrush="Gray" BorderThickness="1" Padding="10" Margin="10" Background="#2A2A2A"
-                        CornerRadius="5" Width="190">
+                        CornerRadius="5" Width="250">
                             <StackPanel>
                                 <!-- Название АЗС -->
                                 <TextBlock Text="{Binding StationName}" FontWeight="Bold" Foreground="White" FontSize="14" TextWrapping="Wrap" HorizontalAlignment="Center"/>

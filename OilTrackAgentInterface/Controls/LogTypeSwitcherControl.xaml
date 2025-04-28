@@ -1,0 +1,49 @@
+﻿<UserControl x:Class="OilTrackAgentInterface.Controls.LogTypeSwitcherControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OilTrackAgentInterface.Controls"
+             Width="Auto" Height="24">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+        <!-- Левая метка -->
+        <TextBlock VerticalAlignment="Center"
+                   Margin="0,0,6,0"
+                   Text="{Binding OnText, RelativeSource={RelativeSource AncestorType=local:LogTypeSwitcherControl}}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#AAA"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsReceiveSelected, RelativeSource={RelativeSource AncestorType=local:LogTypeSwitcherControl}}"
+                                     Value="True">
+                            <Setter Property="Foreground" Value="White"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+
+        <!-- Сам переключатель -->
+        <ToggleButton x:Name="PART_Switch"
+                      Style="{StaticResource SwitchToggleStyle}"
+                      IsChecked="{Binding IsReceiveSelected,
+                                          RelativeSource={RelativeSource AncestorType=local:LogTypeSwitcherControl},
+                                          Mode=TwoWay}"
+                      VerticalAlignment="Center"/>
+
+        <!-- Правая метка -->
+        <TextBlock VerticalAlignment="Center"
+                   Margin="6,0,0,0"
+                   Text="{Binding OffText, RelativeSource={RelativeSource AncestorType=local:LogTypeSwitcherControl}}">
+            <TextBlock.Style>
+                <Style TargetType="TextBlock">
+                    <Setter Property="Foreground" Value="#AAA"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsReceiveSelected, RelativeSource={RelativeSource AncestorType=local:LogTypeSwitcherControl}}"
+                                     Value="False">
+                            <Setter Property="Foreground" Value="White"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBlock.Style>
+        </TextBlock>
+    </StackPanel>
+</UserControl>

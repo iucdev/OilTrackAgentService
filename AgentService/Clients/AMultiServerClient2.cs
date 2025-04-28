@@ -21,7 +21,7 @@ namespace Service.Clients.Client {
     /// MultiServerClient
     /// </summary>
     public abstract class AMultiServerClient2 {
-        internal static Logger Logger = LogManager.GetLogger(typeof(AMultiServerClient2).Name);
+        internal static Logger Logger = LogManager.GetLogger("Reciever");
         internal ObjectSettings ObjectSettings;
 
         protected Timer _timer;

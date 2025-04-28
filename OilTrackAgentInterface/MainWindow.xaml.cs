@@ -52,6 +52,9 @@ namespace OilTrackAgentInterface {
                 case "Объекты производства":
                     MainFrame.Navigate(new Pages.AnalyticsPage());
                     break;
+                case "Логи":
+                    MainFrame.Navigate(new Pages.LogViewerPage());
+                    break;
             }
         }
 

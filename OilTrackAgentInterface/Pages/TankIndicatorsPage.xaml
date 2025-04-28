@@ -5,25 +5,75 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:OilTrackAgentInterface.Pages"
       xmlns:references="clr-namespace:OilTrackAgentInterface.Visibility"
+      xmlns:ctrls="clr-namespace:OilTrackAgentInterface.Controls"
       d:DesignHeight="733" d:DesignWidth="1224"
       mc:Ignorable="d">
     <Page.Resources>
         <references:VolumeUnitTypeToDisplayTextConverter x:Key="VolumeUnitConverter" />
         <references:MassUnitTypeToDisplayTextConverter x:Key="MassUnitConverter" />
         <references:LevelUnitTypeToDisplayTextConverter x:Key="LevelUnitConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <references:BoolInverseToVisibilityConverter x:Key="InvBoolToVis"/>
+
     </Page.Resources>
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="450" />
+            <RowDefinition Height="50" />
+            <RowDefinition Height="410" />
             <!-- Для StackPanel -->
             <RowDefinition Height="*" />
             <!-- Для DataGrid -->
         </Grid.RowDefinitions>
+        <!-- Панель карточек -->
+        <!-- Строка выбора вида -->
+        <ctrls:LogTypeSwitcherControl
+    Margin="0, 0, 10, 0"
+    HorizontalAlignment="Right"
+    OnText="Карточки"
+    OffText="Таблица"
+    IsReceiveSelected="{Binding IsTableView, Mode=TwoWay}" />
+        <!--<StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,20,0">
+            <TextBlock Text="Карточки" VerticalAlignment="Center" Foreground="White" Margin="0,0,8,0"/>
+            <ToggleButton Content="Таблица"
+                  IsChecked="{Binding IsTableView, Mode=TwoWay}"
+                  Width="80"/>
+        </StackPanel>-->
+                <!--Background="#3B3B3B"-->
+        <Border Grid.Row="1"
+                Background="#3B3B3B"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                Visibility="{Binding IsTableView, Converter={StaticResource InvBoolToVis}}"
+        >
+            <ItemsControl ItemsSource="{Binding TankCards}" HorizontalAlignment="Center">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <!-- Передаём весь DataContext карточки вашему контролу -->
+                        <ctrls:TankStatusCardControl
+                            LevelPercent="{Binding LevelPercent}"
+                            StatusText="{Binding StatusText}"
+                            InternalTankId="{Binding InternalTankId}"
+                            OilProductTypeText="{Binding OilProductTypeText}"
+                            CurrentVolume="{Binding CurrentVolume}"
+                            MaxVolume="{Binding MaxVolume}"
+                            UnitText="{Binding UnitText}"
+                            Margin="8"/>        
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Border>
+
         <DataGrid
             x:Name="TanIndicatorsDataGrid"
             IsReadOnly="True"
             AutoGenerateColumns="False"
+            Visibility="{Binding IsTableView, Converter={StaticResource BoolToVis}}"
             ItemsSource="{Binding PagedTankIndicators.PagedItems, UpdateSourceTrigger=PropertyChanged}"
             Sorting="BaseDataGrid_Sorting"
             GridLinesVisibility="None"
@@ -39,7 +89,7 @@
             ScrollViewer.HorizontalScrollBarVisibility="Disabled"
             ScrollViewer.VerticalScrollBarVisibility="Disabled"
             FontFamily="Museo Sans Cyrl"
-            Grid.Row="0">   
+            Grid.Row="1">   
             <DataGrid.Columns>
                 <DataGridTextColumn 
                     Header="Резервуар" 
@@ -109,12 +159,12 @@
 
 
 
-            <!-- Стилизация строк -->
+             <!--Стилизация строк--> 
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="HorizontalAlignment" Value="Center"></Setter>
                     <Setter Property="Margin" Value="0, 20, 0, 0"></Setter>
-                    <!--<Setter Property="VerticalAlignment" Value="Center"></Setter>-->
+                    <Setter Property="VerticalAlignment" Value="Center"></Setter>
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.RowStyle>
@@ -136,7 +186,7 @@
                 </Style>
             </DataGrid.RowStyle>
 
-            <!-- Стилизация заголовков -->
+             <!--Стилизация заголовков--> 
             <DataGrid.ColumnHeaderStyle>
                 <Style TargetType="DataGridColumnHeader">
                     <Setter Property="Background" Value="#1E1D23" />
@@ -153,6 +203,8 @@
             </DataGrid.ColumnHeaderStyle>
         </DataGrid>
 
+        
+
         <!--<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,10,0,10">
             <Button Content="Назад" Command="{Binding PreviousPageCommand}" Margin="5"/>
             <TextBlock Text="{Binding PageInfo}"
@@ -161,11 +213,12 @@
         </StackPanel>-->
 
         <StackPanel 
+            Visibility="{Binding IsTableView, Converter={StaticResource BoolToVis}}"
             Orientation="Horizontal" 
             HorizontalAlignment="Right" 
             VerticalAlignment="Top" 
-            Margin="0,10,20,5"
-            Grid.Row="1">
+            Margin="0,0,20,5"
+            Grid.Row="2">
             <Image Source="/Assets/left-corner.png" Width="24" Height="24" Margin="10" Cursor="Hand"
    MouseDown="OnCommandExecute" Tag="PreviousPageCommand" />
 

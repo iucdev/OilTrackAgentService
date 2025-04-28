@@ -59,12 +59,12 @@ namespace Service.Dtos {
                 connection.Open();
                 string selectQuery = $@"
                     SELECT * FROM {nameof(QueueTaskRecord)} 
-                    WHERE {nameof(Status)} != @{nameof(Status)}
+                    WHERE {nameof(Status)} == @{nameof(Status)}
                     ORDER BY {nameof(Id)}
                     LIMIT 1";
 
                 using (var command = new SQLiteCommand(selectQuery, connection)) {
-                    command.Parameters.AddWithValue($"@{nameof(Status)}", QueueTaskStatus.Processed);
+                    command.Parameters.AddWithValue($"@{nameof(Status)}", QueueTaskStatus.InProcess);
                     using (var reader = command.ExecuteReader()) {
                         if (reader.Read()) {
                             Enum.TryParse<QueueTaskType>(reader[$"{nameof(Type)}"].ToString(), out var type);

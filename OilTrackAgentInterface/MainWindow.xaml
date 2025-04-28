@@ -188,6 +188,10 @@ Click="NavigateToPage"/>
                         <Button Content="Объекты производства"
 Style="{StaticResource NavButtonStyle}"
 Click="NavigateToPage"/>
+                        <!-- Кнопка 'Логи' -->
+                        <Button Content="Логи"
+Style="{StaticResource NavButtonStyle}"
+Click="NavigateToPage"/>
                     </StackPanel>
 
 

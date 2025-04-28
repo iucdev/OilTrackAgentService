@@ -14,7 +14,7 @@ using AgentService.References;
 
 namespace Service.Clients.Scheduler {
     public class QueueTaskJob : Job {
-        private readonly Logger _logger = LogManager.GetLogger(typeof(QueueTaskJob).Name);
+        private readonly Logger _logger = LogManager.GetLogger("Sender");
         private SunpApiClient _sunpApiClient = SunpApiClientSingleton.Instance.SunpApiClient;
         private Timer _timer;
 
